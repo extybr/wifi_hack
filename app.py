@@ -1,12 +1,11 @@
-import os.path
 from flask import Flask, render_template, send_from_directory
-from functions import Type
+from functions import Type, Path
 from functions.manager import *
 
-root_path = os.path.dirname(os.path.abspath(__file__))
-template_path = os.path.join(root_path, 'template')
-css_path = os.path.join(template_path, 'css')
-img_path = os.path.join(template_path, 'img')
+root_path = Path().cwd()
+template_path = root_path / 'template'
+css_path = template_path / 'css'
+img_path = template_path / 'img'
 app = Flask(__name__, template_folder=template_path)
 
 
@@ -157,8 +156,10 @@ def mac_to_wpspin(address: str) -> str:
     return get_mac_to_wpspin(address)
 
 
-@app.route('/name_to_mac/<name>', methods=['GET'])
+@app.route('/name_to_mac/<name>')
 def name_to_mac(name: str) -> str:
+    if name == '<name>':
+        return '<h2>Example: ESSID<p>Example: ASUS-777</p></h2>'
     return get_name_to_mac(name)
 
 
@@ -211,62 +212,62 @@ def wpa_supplicant_status():
             f'{result}</font></h2>')
 
 
-@app.route("/iwconfig", methods=["GET"])
+@app.route("/iwconfig")
 def iwconfig() -> str:
     return get_iwconfig()
 
 
-@app.route("/ifconfig", methods=["GET"])
+@app.route("/ifconfig")
 def ifconfig() -> str:
     return get_ifconfig()
 
 
-@app.route("/iw-wlan-info", methods=["GET"])
+@app.route("/iw-wlan-info")
 def iw_wlan_info() -> str:
     return get_iw_wlan_info()
 
 
-@app.route("/iw-dev-info", methods=["GET"])
+@app.route("/iw-dev-info")
 def iw_dev_info() -> str:
     return get_iw_dev_info()
 
 
-@app.route("/iw-list", methods=["GET"])
+@app.route("/iw-list")
 def iw_list() -> str:
     return get_iw_list()
 
 
-@app.route("/iwlist-scan", methods=["GET"])
+@app.route("/iwlist-scan")
 def iwlist_scan() -> str:
     return get_iwlist_scan()
 
 
-@app.route("/iwlist_wlan_scan_ssid", methods=["GET"])
+@app.route("/iwlist_wlan_scan_ssid")
 def iwlist_wlan_scan_ssid() -> str:
     return get_iwlist_wlan_scan_ssid()
 
 
-@app.route("/nmcli", methods=["GET"])
+@app.route("/nmcli")
 def nmcli() -> str:
     return get_networks()
 
 
-@app.route("/wifi-ap-connect", methods=["GET"])
+@app.route("/wifi-ap-connect")
 def connect_wifi() -> str:
     return connecting_wifi()
 
 
-@app.route("/ps", methods=["GET"])
+@app.route("/ps")
 def ps() -> str:
     return get_ps()
 
 
-@app.route("/ls", methods=["GET"])
+@app.route("/ls")
 def ls() -> str:
     return get_ls()
 
 
-@app.route("/uptime", methods=['GET'])
+@app.route("/uptime")
 def uptime() -> str:
     return get_uptime()
 

