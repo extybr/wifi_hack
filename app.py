@@ -1,8 +1,13 @@
-from flask import Flask
+import os.path
+from flask import Flask, render_template, send_from_directory
 from functions import Type
 from functions.manager import *
 
-app = Flask(__name__)
+root_path = os.path.dirname(os.path.abspath(__file__))
+template_path = os.path.join(root_path, 'template')
+css_path = os.path.join(template_path, 'css')
+img_path = os.path.join(template_path, 'img')
+app = Flask(__name__, template_folder=template_path)
 
 
 @app.errorhandler(404)
@@ -13,6 +18,13 @@ def not_found(error: Type[Exception]) -> str:
         return html + pages()
 
 
+@app.errorhandler(500)
+def bad_argument(error: Type[Exception]) -> str:
+    if str(error)[:3] == '500':
+        html = "<h2><font color='red'>Invalid arguments</font></h2>"
+        return html
+
+
 def pages() -> str:
     html = '<ul><b>'
     for url in app.url_map.iter_rules():
@@ -20,10 +32,20 @@ def pages() -> str:
     return html + "</b></ul></html>"
 
 
+@app.route('/index')
 @app.route('/')
-def index() -> str:
-    html = '<html><h2>List of available pages:</h2>' + pages()
-    return html
+def index():
+    return render_template('index.html')
+
+
+@app.route('/css/<path:path>')
+def send_css(path):
+    return send_from_directory(css_path, path)
+
+
+@app.route('/img/<path:path>')
+def send_img(path):
+    return send_from_directory(img_path, path)
 
 
 @app.route('/mac_change')
@@ -34,6 +56,13 @@ def mac_change() -> str:
 @app.route('/txpower_change')
 def txpower() -> str:
     return change_power()
+
+
+@app.route('/channel_change/<int:channel>', methods=['GET'])
+def ch(channel: int) -> str:
+    if channel < 1 or channel > 13:
+        return "<h2><font color='brown'>Set channel from 1 to 13</font></h2>"
+    return change_channel(channel)
 
 
 @app.route('/airmon-ng_check')
@@ -81,6 +110,31 @@ def airodump() -> str:
     return set_airodump()
 
 
+@app.route('/airbase_fake_ap')
+def airbase_fake_ap() -> str:
+    return set_airbase_fake_ap()
+
+
+@app.route('/mdk3_fake_ap')
+def mdk3_fake_ap() -> str:
+    return set_mdk3_fake_ap()
+
+
+@app.route('/mdk3_deauthentication_all_channel')
+def mdk3_deauthentication() -> str:
+    return set_mdk3_deauthentication()
+
+
+@app.route('/aireplay_deauthentication_all_channel')
+def aireplay_deauthentication() -> str:
+    return set_aireplay_deauthentication()
+
+
+@app.route('/pyrit_striplive')
+def pyrit_striplive() -> str:
+    return set_pyrit_striplive()
+
+
 @app.route('/hcxdumptool_attack')
 def hcxdumptool() -> str:
     return set_hcxdumptool()
@@ -94,6 +148,18 @@ def hcxpcapngtool() -> str:
 @app.route('/start_hashcat')
 def hashcat() -> str:
     return set_hashcat()
+
+
+@app.route('/mac_to_wpspin/<address>', methods=['GET'])
+def mac_to_wpspin(address: str) -> str:
+    if address == '<address>':
+        return '<h2>Example Format: 123456789DF0</h2>'
+    return get_mac_to_wpspin(address)
+
+
+@app.route('/name_to_mac/<name>', methods=['GET'])
+def name_to_mac(name: str) -> str:
+    return get_name_to_mac(name)
 
 
 @app.route('/NetworkManager_stop')
@@ -173,6 +239,11 @@ def iw_list() -> str:
 @app.route("/iwlist-scan", methods=["GET"])
 def iwlist_scan() -> str:
     return get_iwlist_scan()
+
+
+@app.route("/iwlist_wlan_scan_ssid", methods=["GET"])
+def iwlist_wlan_scan_ssid() -> str:
+    return get_iwlist_wlan_scan_ssid()
 
 
 @app.route("/nmcli", methods=["GET"])

