@@ -22,37 +22,37 @@
         </h2>
         <ul class="card-list">
           <li class="items-list">
-            <a href="/mac_change" target="_blank">mac change</a>
+            <a href="/mac_change" target="_blank">change mac (wlan1)</a>
           </li>
           <li class="items-list">
-            <a href="/txpower_change" target="_blank">txpower change</a>
+            <a href="/txpower_change" target="_blank">change txpower (wlan1)</a>
           </li>
           <li class="items-list">
-            <a href="/channel_change/<int:channel>" target="_blank">channel change</a>
+            <a href="/channel_change/<int:channel>" target="_blank">change channel (wlan1)</a>
           </li>
           <li class="items-list">
             <a href="/airmon-ng_check" target="_blank">airmon-ng check</a>
           </li>
           <li class="items-list">
-            <a href="/airmon-ng_check_kill" target="_blank">airmon-ng_check_kill</a>
+            <a href="/airmon-ng_check_kill" target="_blank">airmon-ng check kill</a>
           </li>		  
           <li class="items-list">
-            <a href="/airmon-ng_wlan_mode_monitor" target="_blank">airmon-ng wlan mode monitor</a>
+            <a href="/airmon-ng_wlan_mode_monitor" target="_blank">airmon-ng start (wlan1mon mode monitor)</a>
           </li>
           <li class="items-list">
-            <a href="/wlan_mode_monitor" target="_blank">wlan_mode_monitor</a>
+            <a href="/wlan_mode_monitor" target="_blank">wlan mode monitor (wlan1)</a>
           </li>
           <li class="items-list">
-            <a href="/wlan_set_type_monitor" target="_blank">wlan_set_type_monitor</a>
+            <a href="/wlan_set_type_monitor" target="_blank">wlan set type monitor (wlan1)</a>
           </li>
           <li class="items-list">
-            <a href="/add_mon_type_monitor" target="_blank">add_mon_type_monitor</a>
+            <a href="/add_mon_type_monitor" target="_blank">add mon type monitor (mon0)</a>
           </li>
           <li class="items-list">
-            <a href="/wlan_mode_managed" target="_blank">wlan_mode_managed</a>
+            <a href="/wlan_mode_managed" target="_blank">wlan mode managed (wlan1)</a>
           </li>
           <li class="items-list">
-            <a href="/virtual_interface_delete" target="_blank">virtual_interface_delete</a>
+            <a href="/virtual_interface_delete" target="_blank">remove virtual interface (mon0, wlan1mon)</a>
           </li>
           <li class="items-list">
             01
@@ -65,28 +65,31 @@
         </h2>
         <ul class="card-list">
           <li class="items-list">
-            <a href="/wifi-ap-connect" target="_blank">wifi-ap-connect</a>
-          </li>		
+            <a href="/wifi-ap-connect" target="_blank">connect to AP</a>
+          </li>	
           <li class="items-list">
-            <a href="/NetworkManager_stop" target="_blank">NetworkManager_stop</a>
+            <a href="/http_server" target="_blank">http server (port: 80)</a>
+          </li>	
+          <li class="items-list">
+            <a href="/NetworkManager_stop" target="_blank">stop the NetworkManager service</a>
           </li>
           <li class="items-list">
-            <a href="/NetworkManager_start" target="_blank">NetworkManager_start</a>
+            <a href="/NetworkManager_start" target="_blank">start the NetworkManager service</a>
           </li>
           <li class="items-list">
-            <a href="/NetworkManager_status" target="_blank">NetworkManager_status</a>
+            <a href="/NetworkManager_status" target="_blank">get service NetworkManager status</a>
           </li>
           <li class="items-list">
-            <a href="/NetworkManager_read_conf" target="_blank">NetworkManager_read_conf</a>
+            <a href="/NetworkManager_read_conf" target="_blank">read service NetworkManager config</a>
           </li>
           <li class="items-list">
-            <a href="/wpa_supplicant_stop" target="_blank">wpa_supplicant_stop</a>
+            <a href="/wpa_supplicant_stop" target="_blank">stop the wpa_supplicant</a>
           </li>
           <li class="items-list">
-            <a href="/wpa_supplicant_start" target="_blank">wpa_supplicant_start</a>
+            <a href="/wpa_supplicant_start" target="_blank">start the wpa_supplicant</a>
           </li>
           <li class="items-list">
-            <a href="/wpa_supplicant_status" target="_blank">wpa_supplicant_status</a>
+            <a href="/wpa_supplicant_status" target="_blank">get wpa_supplicant status</a>
           </li>
           <li class="items-list">
             <a href="/ps" target="_blank">ps</a>
@@ -98,7 +101,7 @@
             <a href="/uptime" target="_blank">uptime</a>
           </li>
           <li class="items-list">
-            <a href="/free_port/<int:port>" target="_blank">free_port</a>
+            <a href="/free_port/<int:port>" target="_blank">free port</a>
           </li>	
           <li class="items-list">
             02
@@ -111,31 +114,40 @@
         </h2>
         <ul class="card-list">
           <li class="items-list">
-            <a href="/airodump-ng" target="_blank">airodump-ng</a>
+            <a href="/airodump-ng" target="_blank">airodump-ng (wlan1mon)</a>
           </li>
           <li class="items-list">
-            <a href="/airbase_fake_ap" target="_blank">airbase_fake_ap</a>
+            <a href="/airbase_fake_ap" target="_blank">airbase. fake ap (mon0)</a>
           </li>
           <li class="items-list">
-            <a href="/mdk3_fake_ap" target="_blank">mdk3_fake_ap</a>
+            <a href="/mdk3_fake_ap" target="_blank">mdk3. fake ap (mon0)</a>
           </li>
           <li class="items-list">
-            <a href="/mdk3_deauthentication_all_channel" target="_blank">mdk3_deauthentication_all_channel</a>
+            <a href="/mdk3_deauthentication_all_channel" target="_blank">mdk3. deauthentication all channels (wlan1)</a>
           </li>
           <li class="items-list">
-            <a href="/aireplay_deauthentication_all_channel" target="_blank">aireplay_deauthentication_all_channel</a>
+            <a href="/aireplay_deauthentication_all_channel" target="_blank">aireplay. deauthentication all channels (wlan1)</a>
           </li>
           <li class="items-list">
-            <a href="/pyrit_striplive" target="_blank">pyrit_striplive</a>
+            <a href="/pyrit_striplive" target="_blank">pyrit. striplive (wlan1)</a>
           </li>
           <li class="items-list">
-            <a href="/hcxdumptool_attack" target="_blank">hcxdumptool_attack</a>
+            <a href="/hcxdumptool_attack" target="_blank">hcxdumptool. attack (wlan1)</a>
           </li>
           <li class="items-list">
-            <a href="/hcxpcapngtool_hash" target="_blank">hcxpcapngtool_hash</a>
+            <a href="/hcxpcapngtool_hash" target="_blank">hcxpcapngtool. get hash</a>
           </li>
           <li class="items-list">
-            <a href="/start_hashcat" target="_blank">start_hashcat</a>
+            <a href="/start_hashcat_mask" target="_blank">hashcat (mask ?d?d?d?d?d?d?d?d)</a>
+          </li>
+          <li class="items-list">
+            <a href="/start_hashcat_dict" target="_blank">hashcat (worldlist)</a>
+          </li>
+          <li class="items-list">
+            <a href="/start_kismet" target="_blank">kismet (wlan1mon)</a>
+          </li>
+          <li class="items-list">
+            <a href="/start_horst" target="_blank">horst (wlan1, horst0)</a>
           </li>		  
           <li class="items-list">
             03
@@ -154,28 +166,37 @@
             <a href="/ifconfig" target="_blank">ifconfig</a>
           </li>
           <li class="items-list">
-            <a href="/iw-wlan-info" target="_blank">iw-wlan-info</a>
+            <a href="/hciconfig" target="_blank">hciconfig</a>
           </li>
           <li class="items-list">
-            <a href="/iw-dev-info" target="_blank">iw-dev-info</a>
+            <a href="/iw-wlan-info" target="_blank">iw wlan info (wlan1)</a>
           </li>
           <li class="items-list">
-            <a href="/iw-list" target="_blank">iw-list</a>
+            <a href="/iw-dev-info" target="_blank">iw dev info (all)</a>
           </li>
           <li class="items-list">
-            <a href="/iwlist-scan" target="_blank">iwlist-scan</a>
+            <a href="/iw-list" target="_blank">iw list (all)</a>
           </li>
           <li class="items-list">
-            <a href="/iwlist_wlan_scan_ssid" target="_blank">iwlist_wlan_scan_ssid</a>
+            <a href="/iwlist-scan" target="_blank">iwlist scan (all)</a>
           </li>
           <li class="items-list">
-            <a href="/nmcli" target="_blank">nmcli</a>
-          </li>		  
-          <li class="items-list">
-            <a href="/name_to_mac/<name>" target="_blank">name_to_mac</a>
+            <a href="/iwlist_wlan_scan_ssid" target="_blank">iwlist wlan scan ssid (all)</a>
           </li>
           <li class="items-list">
-            <a href="/mac_to_wpspin/<address>" target="_blank">mac_to_wpspin</a>
+            <a href="/nmcli" target="_blank">nmcli. network scanning (all)</a>
+          </li>
+          <li class="items-list">
+            <a href="/start_script_sniffer" target="_blank">script sniffer. network scanning (wlan1)</a>
+          </li>
+          <li class="items-list">
+            <a href="/start_script_airoscapy" target="_blank">script airoscapy. network scanning (wlan1)</a>
+          </li>			  
+          <li class="items-list">
+            <a href="/name_to_mac/<name>" target="_blank">get name by mac (all)</a>
+          </li>
+          <li class="items-list">
+            <a href="/mac_to_wpspin/<address>" target="_blank">get wpspin by mac</a>
           </li>			  
           <li class="items-list">
             04

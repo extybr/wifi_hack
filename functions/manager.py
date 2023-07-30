@@ -9,11 +9,13 @@ __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
            'get_iwlist_scan', 'get_iw_wlan_info', 'set_wlan_mode_monitor',
            'set_wlan_set_type_monitor', 'set_add_mon_type_monitor', 'get_ps',
            'get_iw_dev_info', 'set_del_mon_interface', 'set_hcxpcapngtool',
-           'set_wpa_supplicant_stop', 'set_wpa_supplicant_start',
-           'get_wpa_supplicant_status', 'set_hashcat', 'get_mac_to_wpspin',
+           'set_wpa_supplicant_stop', 'set_wpa_supplicant_start', 'set_sniffer',
+           'get_wpa_supplicant_status', 'set_hashcat_mask', 'get_mac_to_wpspin',
            'get_name_to_mac', 'get_iwlist_wlan_scan_ssid', 'set_mdk3_fake_ap',
            'set_airbase_fake_ap', 'set_mdk3_deauthentication', 'change_channel',
-           'set_aireplay_deauthentication', 'set_pyrit_striplive']
+           'set_aireplay_deauthentication', 'set_pyrit_striplive', 'set_horst',
+           'set_kismet', 'set_hashcat_dict', 'set_airoscapy', 'get_hciconfig',
+           'start_http_server']
 
 
 def model(cmd, arg):
@@ -28,7 +30,7 @@ def change_mac():
     if 'monitor' in get_iw_wlan_info():
         msg = ("<h2><font color='red'><p>Fail !!!</p></font>"
                f"{WLAN} interface mode <font color='red'>monitor</font>.<p>"
-               f"Change mode to <font color='green'>managed</font></p></h2>")
+               "Change mode to <font color='green'>managed</font></p></h2>")
         return msg
     cmd = [f"ifconfig {WLAN} down",
            f"ifconfig {WLAN} hw ether 00:11:22:33:44:55",
@@ -65,11 +67,13 @@ def network_manager_start():
 
 
 def get_network_manager_status():
-    return model(cmd='service NetworkManager status', arg='')
+    cmd = 'service NetworkManager status'
+    return model(cmd=cmd, arg='')
 
 
 def network_manager_read_conf():
-    result = model(cmd='cat /etc/NetworkManager/NetworkManager.conf', arg='')
+    cmd = 'cat /etc/NetworkManager/NetworkManager.conf'
+    result = model(cmd=cmd, arg='')
     return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
 
 
@@ -89,7 +93,8 @@ def set_wpa_supplicant_start():
 
 
 def get_wpa_supplicant_status():
-    return model(cmd='systemctl status wpa_supplicant.service', arg='')
+    cmd = 'systemctl status wpa_supplicant.service'
+    return model(cmd=cmd, arg='')
 
 
 def get_airmon_check():
@@ -98,12 +103,14 @@ def get_airmon_check():
 
 
 def set_airmon_check_kill():
-    result = model(cmd='airmon-ng check kill', arg='')
+    cmd = 'airmon-ng check kill'
+    result = model(cmd=cmd, arg='')
     return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
 
 
 def set_airmon_mode_monitor():
-    model(cmd=f'airmon-ng start {WLAN}', arg='')
+    cmd = f'airmon-ng start {WLAN}'
+    model(cmd=cmd, arg='')
     return "<h2><font color='red'>FINISH</font></h2>"
 
 
@@ -133,13 +140,14 @@ def set_mode_managed():
     cmd = [f"airmon-ng stop {WLAN}mon",
            f"ifconfig {WLAN}mon down",
            f"ifconfig {WLAN} down",
-           f"iwconfig {WLAN} mode managed",
+           f"iw dev {WLAN} set type managed",
            f"ifconfig {WLAN} up"]
     [subprocess.call(i, shell=True) for i in cmd]
     return f"<h2>{WLAN} mode changed to <font color='green'>managed</font></h2>"
 
 
 def set_del_mon_interface():
+    set_mode_managed()
     cmd = [f"iw dev {MON} del",
            f"iw dev {WLAN}mon del"]
     [subprocess.call(i, shell=True) for i in cmd]
@@ -147,7 +155,11 @@ def set_del_mon_interface():
 
 
 def set_airodump():
-    result = model(cmd=f'xterm -e airodump-ng {WLAN}mon', arg='')
+    if f'{WLAN}mon' and 'type monitor' not in get_iw_dev_info():
+        set_mode_managed()
+        set_airmon_mode_monitor()
+    cmd = f"gnome-terminal --tab -- bash -c 'airodump-ng {WLAN}mon'"
+    result = model(cmd=cmd, arg='')
     return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
 
 
@@ -181,17 +193,19 @@ def set_aireplay_deauthentication():
 
 
 def set_pyrit_striplive():
-    cmd = f'xterm -e pyrit -r {WLAN} -o {DUMP} stripLive'
+    set_mode_managed()
+    set_wlan_mode_monitor()
+    cmd = f"gnome-terminal --tab -- bash -c 'pyrit -r {WLAN} -o {DUMP} stripLive'"
     subprocess.run(cmd, shell=True)
-    return f"<h2><font color='red'>FINISH</font></h2>"
+    return "<h2><font color='red'>FINISH</font></h2>"
 
 
 def set_hcxdumptool():
-    cmd = f'xterm -e {PATH} -i {WLAN} -w {DUMP}'
+    cmd = f"gnome-terminal --tab -- bash -c '{PATH} -i {WLAN} -w {DUMP}'"
     # cmd = f'xterm -e hcxdumptool -i {WLAN} -o {DUMP} --enable_status=2'
     # subprocess.call(cmd, shell=True)
     subprocess.run(cmd, shell=True)
-    return f"<h2><font color='red'>FINISH</font></h2>"
+    return "<h2><font color='red'>FINISH</font></h2>"
 
 
 def set_hcxpcapngtool():
@@ -209,15 +223,48 @@ def set_hcxpcapngtool():
         for item in data:
             word = bytes.fromhex(item[5]).decode()
             result += f'<li>{word}</li>'
-        return f"<h2>{hashes}<font color='green'>{result}</ul></font></h2>"
-    return f"<h2><font color='red'>NOT FOUND</font></h2>"
+        return f"<h2>{hashes}<font color='green'>{result}</font></h2></ul>"
+    return "<h2><font color='red'>NOT FOUND</font></h2>"
 
 
-def set_hashcat():
-    # cmd = f"xterm -e hashcat -m 22000 {HASH} /usr/share/dict/wordlist-probable.txt"
-    cmd = f"xterm -e hashcat -m 22000 {HASH} -a 3 ?d?d?d?d?d?d?d?d"
+def set_hashcat_mask():
+    cmd = (f"gnome-terminal --tab -- bash -c 'hashcat -m 22000 {HASH} "
+           f"-a 3 ?d?d?d?d?d?d?d?d'")
     subprocess.run(cmd, shell=True)
-    return f"<h2><font color='red'>FINISH</font></h2>"
+    return "<h2><font color='red'>FINISH</font></h2>"
+
+
+def set_hashcat_dict():
+    cmd = (f"gnome-terminal --tab -- bash -c 'hashcat -m 22000 {HASH} "
+           f"/usr/share/dict/wordlist-probable.txt'")
+    subprocess.run(cmd, shell=True)
+    return "<h2><font color='red'>FINISH</font></h2>"
+
+
+def set_kismet():
+    cmd = "xterm -e kismet"
+    subprocess.run(cmd, shell=True)
+    return "<h2><font color='red'>FINISH</font></h2>"
+
+
+def set_horst():
+    cmd = f"gnome-terminal --tab -- bash -c 'horst -i {WLAN}'"
+    subprocess.run(cmd, shell=True)
+    return "<h2><font color='red'>FINISH</font></h2>"
+
+
+def set_sniffer():
+    set_wlan_mode_monitor()
+    cmd = f"gnome-terminal --window -- bash -c 'python2 functions/sniffer.py -i {WLAN}'"
+    subprocess.run(cmd, shell=True)
+    return "<h2><font color='red'>FINISH</font></h2>"
+
+
+def set_airoscapy():
+    set_wlan_mode_monitor()
+    cmd = f"gnome-terminal --window -- bash -c 'python2 functions/airoscapy.py {WLAN}'"
+    subprocess.run(cmd, shell=True)
+    return "<h2><font color='red'>FINISH</font></h2>"
 
 
 def get_mac_to_wpspin(mac: str) -> str:
@@ -257,13 +304,21 @@ def get_iwconfig() -> str:
     return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
 
 
+def get_hciconfig() -> str:
+    cmd = "hciconfig -a"
+    result = model(cmd=cmd, arg='')
+    return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
+
+
 def get_iwlist_scan() -> str:
-    result = model(cmd="iwlist scan", arg='')
+    cmd = "iwlist scan"
+    result = model(cmd=cmd, arg='')
     return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
 def get_iw_list() -> str:
-    result = model(cmd="iw list", arg='')
+    cmd = "iw list"
+    result = model(cmd=cmd, arg='')
     return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
@@ -283,22 +338,32 @@ def get_iwlist_wlan_scan_mac() -> set:
 
 
 def get_iw_wlan_info() -> str:
-    result = model(cmd=f"iw {WLAN} info", arg='')
+    cmd = f"iw {WLAN} info"
+    result = model(cmd=cmd, arg='')
     return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
 def get_iw_dev_info() -> str:
-    result = model(cmd="iw dev", arg='')
+    cmd = "iw dev"
+    result = model(cmd=cmd, arg='')
     return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
 def get_networks() -> str:
-    result = model(cmd="nmcli dev wifi", arg='con')
+    cmd = "nmcli dev wifi"
+    result = model(cmd=cmd, arg='con')
     return f"<h3><font color='purple'><pre>{result}</pre></font></h3>"
 
 
 def connecting_wifi() -> str:
-    result = model(cmd=f"nmcli dev wifi con '{AP}' password {PASS}", arg='')
+    cmd = f"nmcli dev wifi con '{AP}' password {PASS}"
+    result = model(cmd=cmd, arg='')
+    return f"<h2><font color='green'><pre>{result}</pre></font></h2>"
+
+
+def start_http_server() -> str:
+    cmd = "gnome-terminal --window -- bash -c 'python3 -m http.server 80'"
+    result = model(cmd=cmd, arg='')
     return f"<h2><font color='green'><pre>{result}</pre></font></h2>"
 
 
@@ -318,7 +383,8 @@ def get_uptime() -> str:
 
 
 def get_ls() -> str:
-    result = model(cmd="ls -lia", arg='')
+    cmd = "ls -lia"
+    result = model(cmd=cmd, arg='')
     return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
 
 

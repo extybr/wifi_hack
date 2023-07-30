@@ -3,9 +3,9 @@ from functions import Type, Path
 from functions.manager import *
 
 root_path = Path().cwd()
-template_path = root_path / 'template'
-css_path = template_path / 'css'
-img_path = template_path / 'img'
+template_path = Path(root_path) / 'template'
+css_path = Path(template_path) / 'css'
+img_path = Path(template_path) / 'img'
 app = Flask(__name__, template_folder=template_path)
 
 
@@ -144,9 +144,34 @@ def hcxpcapngtool() -> str:
     return set_hcxpcapngtool()
 
 
-@app.route('/start_hashcat')
-def hashcat() -> str:
-    return set_hashcat()
+@app.route('/start_hashcat_mask')
+def hashcat_mask() -> str:
+    return set_hashcat_mask()
+
+
+@app.route('/start_hashcat_dict')
+def hashcat_dict() -> str:
+    return set_hashcat_dict()
+
+
+@app.route('/start_kismet')
+def kismet() -> str:
+    return set_kismet()
+
+
+@app.route('/start_horst')
+def horst() -> str:
+    return set_horst()
+
+
+@app.route('/start_script_sniffer')
+def sniffer() -> str:
+    return set_sniffer()
+
+
+@app.route('/start_script_airoscapy')
+def airoscapy() -> str:
+    return set_airoscapy()
 
 
 @app.route('/mac_to_wpspin/<address>', methods=['GET'])
@@ -222,6 +247,11 @@ def ifconfig() -> str:
     return get_ifconfig()
 
 
+@app.route("/hciconfig")
+def hciconfig() -> str:
+    return get_hciconfig()
+
+
 @app.route("/iw-wlan-info")
 def iw_wlan_info() -> str:
     return get_iw_wlan_info()
@@ -255,6 +285,11 @@ def nmcli() -> str:
 @app.route("/wifi-ap-connect")
 def connect_wifi() -> str:
     return connecting_wifi()
+
+
+@app.route("/http_server")
+def http_server() -> str:
+    return start_http_server()
 
 
 @app.route("/ps")
