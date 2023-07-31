@@ -104,6 +104,13 @@ def delete_interface() -> str:
     return set_del_mon_interface()
 
 
+@app.route('/tempfiles_delete')
+def delete_tempfiles() -> str:
+    path = Path()
+    ext = ['kismet', '22000', 'log', 'pcap']
+    return set_del_tempfiles(path, ext)
+
+
 @app.route('/airodump-ng')
 def airodump() -> str:
     return set_airodump()

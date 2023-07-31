@@ -15,7 +15,7 @@ __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
            'set_airbase_fake_ap', 'set_mdk3_deauthentication', 'change_channel',
            'set_aireplay_deauthentication', 'set_pyrit_striplive', 'set_horst',
            'set_kismet', 'set_hashcat_dict', 'set_airoscapy', 'get_hciconfig',
-           'start_http_server']
+           'start_http_server', 'set_del_tempfiles']
 
 
 def model(cmd, arg):
@@ -154,6 +154,13 @@ def set_del_mon_interface():
     return "<h2>virtual interface <font color='red'>delete</font></h2>"
 
 
+def set_del_tempfiles(path, ext):
+    for i in ext:
+        files = Path(path).glob(f"*.{i}")
+        [Path(file).unlink() for file in files]
+    return "<h2><font color='red'>remove </font>tempfiles</h2>"
+
+
 def set_airodump():
     if f'{WLAN}mon' and 'type monitor' not in get_iw_dev_info():
         set_mode_managed()
@@ -210,7 +217,7 @@ def set_hcxdumptool():
 
 def set_hcxpcapngtool():
     if Path(DUMP).exists():
-        cmd = f'hcxpcapngtool -o {HASH} -E wordlist {DUMP}'
+        cmd = f'hcxpcapngtool -o {HASH} -E wordlist.log {DUMP}'
         subprocess.run(cmd, shell=True)
         Path(DUMP).rename('old_' + DUMP)
     if Path(HASH).exists():
