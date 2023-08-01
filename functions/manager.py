@@ -15,7 +15,8 @@ __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
            'set_airbase_fake_ap', 'set_mdk3_deauthentication', 'change_channel',
            'set_aireplay_deauthentication', 'set_pyrit_striplive', 'set_horst',
            'set_kismet', 'set_hashcat_dict', 'set_airoscapy', 'get_hciconfig',
-           'start_http_server', 'set_del_tempfiles']
+           'start_http_server', 'set_del_tempfiles', 'get_rfkill_list',
+           'get_lspci_lsusb', 'get_ip']
 
 
 def model(cmd, arg):
@@ -137,20 +138,31 @@ def set_add_mon_type_monitor():
 
 
 def set_mode_managed():
-    cmd = [f"airmon-ng stop {WLAN}mon",
-           f"ifconfig {WLAN}mon down",
-           f"ifconfig {WLAN} down",
-           f"iw dev {WLAN} set type managed",
-           f"ifconfig {WLAN} up"]
-    [subprocess.call(i, shell=True) for i in cmd]
-    return f"<h2>{WLAN} mode changed to <font color='green'>managed</font></h2>"
+    for i in ['wlan0mon', 'wlan1mon', 'wlan2mon']:
+        if i in get_iw_dev_info():
+            cmd = [f"ifconfig {i} down",
+                   f"ifconfig {i[:-3]} down",
+                   f"iw dev {i} set type managed",
+                   f"iw {i} interface add {i[:-3]} type managed",
+                   f"ifconfig {i[:-3]} up"]
+            [subprocess.call(k, shell=True) for k in cmd]
+    for i in ['wlan0', 'wlan1', 'wlan2']:
+        if i in get_iw_dev_info():
+            cmd = [f"ifconfig {i} down",
+                   f"iw dev {i} set type managed",
+                   f"ifconfig {i} up"]
+            [subprocess.call(i, shell=True) for i in cmd]
+    return "<h2>wlan mode changed to <font color='green'>managed</font></h2>"
 
 
 def set_del_mon_interface():
     set_mode_managed()
-    cmd = [f"iw dev {MON} del",
-           f"iw dev {WLAN}mon del"]
-    [subprocess.call(i, shell=True) for i in cmd]
+    for i in ['wlan0mon', 'wlan1mon', 'wlan2mon']:
+        if i in get_iw_dev_info():
+            cmd = f"iw dev {i} del"
+            subprocess.call(cmd, shell=True)
+    cmd = f"iw dev {MON} del"
+    subprocess.call(cmd, shell=True)
     return "<h2>virtual interface <font color='red'>delete</font></h2>"
 
 
@@ -305,9 +317,29 @@ def get_ifconfig() -> str:
     return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
 
 
+def get_ip() -> str:
+    cmd = "ip a"
+    result = model(cmd=cmd, arg='')
+    return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
+
+
+def get_lspci_lsusb() -> str:
+    result = ''
+    cmd = ["lspci", "lsusb"]
+    for i in cmd:
+        result += '<p>' + model(cmd=i, arg='') + '</p>'
+    return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
+
+
+def get_rfkill_list() -> str:
+    cmd = "rfkill list all"
+    result = model(cmd=cmd, arg='')
+    return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
+
+
 def get_iwconfig() -> str:
-    command = "iwconfig"
-    result = subprocess.run(command, capture_output=True).stdout.decode()
+    cmd = "iwconfig"
+    result = model(cmd=cmd, arg='')
     return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
 
 
@@ -390,8 +422,10 @@ def get_uptime() -> str:
 
 
 def get_ls() -> str:
-    cmd = "ls -lia"
-    result = model(cmd=cmd, arg='')
+    result = ''
+    for i in ['.', 'functions', 'template']:
+        cmd = f"ls -lia {i}"
+        result += '<p>' + model(cmd=cmd, arg='') + '</p>'
     return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
 
 

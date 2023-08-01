@@ -254,6 +254,21 @@ def ifconfig() -> str:
     return get_ifconfig()
 
 
+@app.route("/ip_a")
+def ip() -> str:
+    return get_ip()
+
+
+@app.route("/lspci_lsusb")
+def lspci_lsusb() -> str:
+    return get_lspci_lsusb()
+
+
+@app.route("/rfkill_list")
+def rfkill() -> str:
+    return get_rfkill_list()
+
+
 @app.route("/hciconfig")
 def hciconfig() -> str:
     return get_hciconfig()

@@ -49,16 +49,18 @@
             <a href="/add_mon_type_monitor" target="_blank">add mon type monitor (mon0)</a>
           </li>
           <li class="items-list">
-            <a href="/wlan_mode_managed" target="_blank">wlan mode managed (wlan1)</a>
+            <a href="/wlan_mode_managed" target="_blank">wlan mode managed (wlanX, wlanXmon)</a>
           </li>
           <li class="items-list">
-            <a href="/virtual_interface_delete" target="_blank">remove virtual interface (mon0, wlan1mon)</a>
+            <a href="/virtual_interface_delete" target="_blank">remove virtual interface (mon0, wlanXmon)</a>
           </li>
           <li class="items-list">
             <a href="/tempfiles_delete" target="_blank">remove tempfiles (pcap, log, kismet, 22000)</a>
           </li>
           <li class="items-list">
-            01
+            <a href="/mac_to_wpspin/<address>" target="_blank">get wpspin by mac</a>
+          </li>
+          <li class="items-list">
           </li>
         </ul>
       </li>
@@ -107,7 +109,6 @@
             <a href="/free_port/<int:port>" target="_blank">free port</a>
           </li>	
           <li class="items-list">
-            02
           </li>
         </ul>
       </li>
@@ -147,13 +148,12 @@
             <a href="/start_hashcat_dict" target="_blank">hashcat (worldlist)</a>
           </li>
           <li class="items-list">
-            <a href="/start_kismet" target="_blank">kismet (wlan1mon)</a>
+            <a href="/start_kismet" target="_blank">kismet (wlanXmon)</a>
           </li>
           <li class="items-list">
             <a href="/start_horst" target="_blank">horst (wlan1, horst0)</a>
           </li>		  
           <li class="items-list">
-            03
           </li>
         </ul>
       </li>
@@ -170,6 +170,15 @@
           </li>
           <li class="items-list">
             <a href="/hciconfig" target="_blank">hciconfig</a>
+          </li>
+          <li class="items-list">
+            <a href="/ip_a" target="_blank">ip a</a>
+          </li>
+          <li class="items-list">
+            <a href="/lspci_lsusb" target="_blank">lspci, lsusb</a>
+          </li>
+          <li class="items-list">
+            <a href="/rfkill_list" target="_blank">rfkill list</a>
           </li>
           <li class="items-list">
             <a href="/iw-wlan-info" target="_blank">iw wlan info (wlan1)</a>
@@ -190,19 +199,15 @@
             <a href="/nmcli" target="_blank">nmcli. network scanning (all)</a>
           </li>
           <li class="items-list">
+            <a href="/name_to_mac/<name>" target="_blank">get name by mac (all)</a>
+          </li>
+          <li class="items-list">
             <a href="/start_script_sniffer" target="_blank">script sniffer. network scanning (wlan1)</a>
           </li>
           <li class="items-list">
             <a href="/start_script_airoscapy" target="_blank">script airoscapy. network scanning (wlan1)</a>
-          </li>			  
+          </li>			  			  
           <li class="items-list">
-            <a href="/name_to_mac/<name>" target="_blank">get name by mac (all)</a>
-          </li>
-          <li class="items-list">
-            <a href="/mac_to_wpspin/<address>" target="_blank">get wpspin by mac</a>
-          </li>			  
-          <li class="items-list">
-            04
           </li>
         </ul>
       </li>	  
