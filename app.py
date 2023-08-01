@@ -1,5 +1,5 @@
 from flask import Flask, render_template, send_from_directory
-from functions import Type, Path
+from functions import Type, Path, TEMPFOLDER
 from functions.manager import *
 
 root_path = Path().cwd()
@@ -106,8 +106,8 @@ def delete_interface() -> str:
 
 @app.route('/tempfiles_delete')
 def delete_tempfiles() -> str:
-    path = Path()
-    ext = ['kismet', '22000', 'log', 'pcap']
+    path = Path(TEMPFOLDER)
+    ext = ['kismet', 'hash', 'log', 'pcap', 'cap', 'csv', 'netxml']
     return set_del_tempfiles(path, ext)
 
 

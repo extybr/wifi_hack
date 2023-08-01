@@ -137,32 +137,41 @@ def set_add_mon_type_monitor():
     return f"<h2>{WLAN} added mon mode <font color='red'>monitor</font></h2>"
 
 
+def get_phy():
+    cmd = 'ifconfig -s'
+    result = []
+    out = subprocess.check_output(cmd, shell=True).decode().strip().split('\n')
+    for i in out[1:]:
+        result.append(i.strip().split(' ')[0])
+    return result
+
+
 def set_mode_managed():
+    phy = get_phy()
     for i in ['wlan0mon', 'wlan1mon', 'wlan2mon']:
-        if i in get_iw_dev_info():
-            cmd = [f"ifconfig {i} down",
-                   f"ifconfig {i[:-3]} down",
-                   f"iw dev {i} set type managed",
-                   f"iw {i} interface add {i[:-3]} type managed",
-                   f"ifconfig {i[:-3]} up"]
-            [subprocess.call(k, shell=True) for k in cmd]
-    for i in ['wlan0', 'wlan1', 'wlan2']:
-        if i in get_iw_dev_info():
+        if i in phy:
             cmd = [f"ifconfig {i} down",
                    f"iw dev {i} set type managed",
                    f"ifconfig {i} up"]
-            [subprocess.call(i, shell=True) for i in cmd]
+            [subprocess.call(k, shell=True) for k in cmd]
+        if phy.count(i[:-3]) < 2:
+            cmd = f"iw {i} interface add {i[:-3]} type managed"
+            subprocess.call(cmd, shell=True)
+    for i in ['wlan0', 'wlan1', 'wlan2']:
+        if i in phy:
+            cmd = [f"ifconfig {i} down",
+                   f"iw dev {i} set type managed",
+                   f"ifconfig {i} up"]
+            [subprocess.call(k, shell=True) for k in cmd]
     return "<h2>wlan mode changed to <font color='green'>managed</font></h2>"
 
 
 def set_del_mon_interface():
     set_mode_managed()
-    for i in ['wlan0mon', 'wlan1mon', 'wlan2mon']:
-        if i in get_iw_dev_info():
+    for i in [f'{MON}', 'wlan0mon', 'wlan1mon', 'wlan2mon']:
+        if i in get_phy():
             cmd = f"iw dev {i} del"
             subprocess.call(cmd, shell=True)
-    cmd = f"iw dev {MON} del"
-    subprocess.call(cmd, shell=True)
     return "<h2>virtual interface <font color='red'>delete</font></h2>"
 
 
@@ -177,7 +186,8 @@ def set_airodump():
     if f'{WLAN}mon' and 'type monitor' not in get_iw_dev_info():
         set_mode_managed()
         set_airmon_mode_monitor()
-    cmd = f"gnome-terminal --tab -- bash -c 'airodump-ng {WLAN}mon'"
+    cmd = (f"gnome-terminal --tab -- bash -c "
+           f"'airodump-ng {WLAN}mon -w {TEMPFOLDER}/airodump'")
     result = model(cmd=cmd, arg='')
     return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
 
@@ -220,6 +230,7 @@ def set_pyrit_striplive():
 
 
 def set_hcxdumptool():
+    set_del_mon_interface()
     cmd = f"gnome-terminal --tab -- bash -c '{PATH} -i {WLAN} -w {DUMP}'"
     # cmd = f'xterm -e hcxdumptool -i {WLAN} -o {DUMP} --enable_status=2'
     # subprocess.call(cmd, shell=True)
@@ -229,9 +240,9 @@ def set_hcxdumptool():
 
 def set_hcxpcapngtool():
     if Path(DUMP).exists():
-        cmd = f'hcxpcapngtool -o {HASH} -E wordlist.log {DUMP}'
+        cmd = f'hcxpcapngtool -o {HASH} -E {AP_ST_LIST} {DUMP}'
         subprocess.run(cmd, shell=True)
-        Path(DUMP).rename('old_' + DUMP)
+        Path(DUMP).rename(f'{DUMP}.pcap')
     if Path(HASH).exists():
         hashes = model(cmd=f'cat {HASH}', arg='')
         data = []
@@ -254,8 +265,8 @@ def set_hashcat_mask():
 
 
 def set_hashcat_dict():
-    cmd = (f"gnome-terminal --tab -- bash -c 'hashcat -m 22000 {HASH} "
-           f"/usr/share/dict/wordlist-probable.txt'")
+    cmd = (f"gnome-terminal --tab -- bash -c 'hashcat -m 22000 "
+           f"{HASH} {DICTIONARY}'")
     subprocess.run(cmd, shell=True)
     return "<h2><font color='red'>FINISH</font></h2>"
 
@@ -274,14 +285,16 @@ def set_horst():
 
 def set_sniffer():
     set_wlan_mode_monitor()
-    cmd = f"gnome-terminal --window -- bash -c 'python2 functions/sniffer.py -i {WLAN}'"
+    cmd = (f"gnome-terminal --window -- bash -c "
+           f"'python2 functions/sniffer.py -i {WLAN}'")
     subprocess.run(cmd, shell=True)
     return "<h2><font color='red'>FINISH</font></h2>"
 
 
 def set_airoscapy():
     set_wlan_mode_monitor()
-    cmd = f"gnome-terminal --window -- bash -c 'python2 functions/airoscapy.py {WLAN}'"
+    cmd = (f"gnome-terminal --window -- bash -c "
+           f"'python2 functions/airoscapy.py {WLAN}'")
     subprocess.run(cmd, shell=True)
     return "<h2><font color='red'>FINISH</font></h2>"
 
