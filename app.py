@@ -126,9 +126,9 @@ def mdk3_fake_ap() -> str:
     return set_mdk3_fake_ap()
 
 
-@app.route('/mdk3_deauthentication_all_channel')
-def mdk3_deauthentication() -> str:
-    return set_mdk3_deauthentication()
+@app.route('/mdk4_deauthentication_all_channel')
+def mdk4_deauthentication() -> str:
+    return set_mdk4_deauthentication()
 
 
 @app.route('/aireplay_deauthentication_all_channel')
@@ -136,9 +136,29 @@ def aireplay_deauthentication() -> str:
     return set_aireplay_deauthentication()
 
 
+@app.route('/wifite-reaver')
+def wifite() -> str:
+    return set_wifite()
+
+
+@app.route('/wifiphisher')
+def wifiphisher() -> str:
+    return set_wifiphisher()
+
+
+@app.route('/waidps')
+def waidps() -> str:
+    return set_waidps()
+
+
 @app.route('/pyrit_striplive')
 def pyrit_striplive() -> str:
     return set_pyrit_striplive()
+
+
+@app.route('/airgeddon_attack')
+def airgeddon() -> str:
+    return set_airgeddon()
 
 
 @app.route('/hcxdumptool_attack')

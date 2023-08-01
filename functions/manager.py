@@ -12,11 +12,12 @@ __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
            'set_wpa_supplicant_stop', 'set_wpa_supplicant_start', 'set_sniffer',
            'get_wpa_supplicant_status', 'set_hashcat_mask', 'get_mac_to_wpspin',
            'get_name_to_mac', 'get_iwlist_wlan_scan_ssid', 'set_mdk3_fake_ap',
-           'set_airbase_fake_ap', 'set_mdk3_deauthentication', 'change_channel',
+           'set_airbase_fake_ap', 'set_mdk4_deauthentication', 'change_channel',
            'set_aireplay_deauthentication', 'set_pyrit_striplive', 'set_horst',
            'set_kismet', 'set_hashcat_dict', 'set_airoscapy', 'get_hciconfig',
            'start_http_server', 'set_del_tempfiles', 'get_rfkill_list',
-           'get_lspci_lsusb', 'get_ip', 'set_tshark', 'set_wireshark']
+           'get_lspci_lsusb', 'get_ip', 'set_tshark', 'set_wireshark',
+           'set_airgeddon', 'set_wifite', 'set_wifiphisher', 'set_waidps']
 
 
 def model(cmd, arg):
@@ -207,9 +208,8 @@ def set_mdk3_fake_ap():
     return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
 
 
-def set_mdk3_deauthentication():
-    # cmd = f"xterm -e mdk3 {WLAN} d -c 1"
-    cmd = f"xterm -e mdk3 {WLAN} d"
+def set_mdk4_deauthentication():
+    cmd = f"xterm -e mdk3 {WLAN} d -c"
     model(cmd=cmd, arg='')
     return "<h2><font color='red'>FINISH</font></h2>"
 
@@ -221,10 +221,35 @@ def set_aireplay_deauthentication():
     return "<h2><font color='red'>FINISH</font></h2>"
 
 
+def set_wifite():
+    cmd = "gnome-terminal --tab -- bash -c 'wifite --reaver'"
+    subprocess.run(cmd, shell=True)
+    return "<h2><font color='red'>FINISH</font></h2>"
+
+
+def set_wifiphisher():
+    cmd = "gnome-terminal --tab -- bash -c 'wifiphisher'"
+    subprocess.run(cmd, shell=True)
+    return "<h2><font color='red'>FINISH</font></h2>"
+
+
+def set_waidps():
+    set_wlan_mode_monitor()
+    cmd = f"gnome-terminal --tab -- bash -c 'python2 {WAIDPS} -i {WLAN}'"
+    subprocess.run(cmd, shell=True)
+    return "<h2><font color='red'>FINISH</font></h2>"
+
+
 def set_pyrit_striplive():
     set_mode_managed()
     set_wlan_mode_monitor()
     cmd = f"gnome-terminal --tab -- bash -c 'pyrit -r {WLAN} -o {DUMP} stripLive'"
+    subprocess.run(cmd, shell=True)
+    return "<h2><font color='red'>FINISH</font></h2>"
+
+
+def set_airgeddon():
+    cmd = "gnome-terminal --tab -- bash -c 'airgeddon'"
     subprocess.run(cmd, shell=True)
     return "<h2><font color='red'>FINISH</font></h2>"
 
