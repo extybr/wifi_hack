@@ -16,7 +16,7 @@ __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
            'set_aireplay_deauthentication', 'set_pyrit_striplive', 'set_horst',
            'set_kismet', 'set_hashcat_dict', 'set_airoscapy', 'get_hciconfig',
            'start_http_server', 'set_del_tempfiles', 'get_rfkill_list',
-           'get_lspci_lsusb', 'get_ip']
+           'get_lspci_lsusb', 'get_ip', 'set_tshark', 'set_wireshark']
 
 
 def model(cmd, arg):
@@ -281,6 +281,24 @@ def set_horst():
     cmd = f"gnome-terminal --tab -- bash -c 'horst -i {WLAN}'"
     subprocess.run(cmd, shell=True)
     return "<h2><font color='red'>FINISH</font></h2>"
+
+
+def set_tshark():
+    if Path(DUMP).exists():
+        cmd = (f'tshark -r {DUMP} -Y "wlan.fc.type_subtype == 0x08 '
+               f'|| wlan.fc.type_subtype == 0x04 || eapol"')
+        result = model(cmd=cmd, arg='')
+        return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
+    return "<h2><font color='red'>NOT FOUND</font></h2>"
+
+
+def set_wireshark():
+    if Path(DUMP).exists():
+        cmd = (f'wireshark -r {DUMP} -Y "wlan.fc.type_subtype == 0x08 '
+               f'|| wlan.fc.type_subtype == 0x04 || eapol"')
+        subprocess.run(cmd, shell=True)
+        return "<h2><font color='red'>FINISH</font></h2>"
+    return "<h2><font color='red'>NOT FOUND</font></h2>"
 
 
 def set_sniffer():

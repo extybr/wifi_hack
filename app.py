@@ -171,6 +171,16 @@ def horst() -> str:
     return set_horst()
 
 
+@app.route('/start_tshark')
+def tshark() -> str:
+    return set_tshark()
+
+
+@app.route('/start_wireshark')
+def wireshark() -> str:
+    return set_wireshark()
+
+
 @app.route('/start_script_sniffer')
 def sniffer() -> str:
     return set_sniffer()
