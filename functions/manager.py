@@ -50,7 +50,7 @@ def change_power():
     return f"<h2><font color='green'>txpower {WLAN} changed</h2></font>"
 
 
-def change_channel(ch):
+def change_channel(ch: int):
     cmd = f"iwconfig {WLAN} channel {ch}"
     subprocess.call(cmd, shell=True)
     return f"<h2><font color='green'>channel {WLAN} changed on </font>{ch}</h2>"
@@ -479,7 +479,7 @@ def get_uptime() -> str:
 
 def get_ls() -> str:
     result = ''
-    for i in ['.', 'functions', 'template']:
+    for i in ['.', 'functions', 'template', 'tempfiles']:
         cmd = f"ls -lia {i}"
         result += '<p>' + model(cmd=cmd, arg='') + '</p>'
     return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"

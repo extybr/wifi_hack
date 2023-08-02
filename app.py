@@ -37,6 +37,13 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/help')
+def md_help():
+    with open('template/help.md', 'r', encoding='utf-8') as text:
+        man = text.read()
+    return f"<h1><font color='blue'><pre>{man}</pre></font></h1>"
+
+
 @app.route('/css/<path:path>')
 def send_css(path):
     return send_from_directory(css_path, path)
@@ -57,11 +64,11 @@ def txpower() -> str:
     return change_power()
 
 
-@app.route('/channel_change/<int:channel>', methods=['GET'])
-def ch(channel: int) -> str:
-    if channel < 1 or channel > 13:
+@app.route('/channel_change/<channel>', methods=['GET'])
+def ch(channel) -> str:
+    if not str(channel).isdigit() or int(channel) < 1 or int(channel) > 13:
         return "<h2><font color='brown'>Set channel from 1 to 13</font></h2>"
-    return change_channel(channel)
+    return change_channel(int(channel))
 
 
 @app.route('/airmon-ng_check')
@@ -213,7 +220,7 @@ def airoscapy() -> str:
 
 @app.route('/mac_to_wpspin/<address>', methods=['GET'])
 def mac_to_wpspin(address: str) -> str:
-    if address == '<address>':
+    if len(address) != 12 or [i for i in address if i not in '0123456789abcdefABCDEF']:
         return '<h2>Example Format: 123456789DF0</h2>'
     return get_mac_to_wpspin(address)
 
@@ -359,9 +366,11 @@ def uptime() -> str:
     return get_uptime()
 
 
-@app.route("/free_port/<int:port>", methods=['GET'])
-def get_proc(port: int) -> str:
-    proc = get_pids(port)[1]
+@app.route("/free_port/<port>", methods=['GET'])
+def get_proc(port) -> str:
+    if not str(port).isdigit() or int(port) < 0 or int(port) > 65535:
+        return "<h2><font color='brown'>Set port from 0 to 65535</font></h2>"
+    proc = get_pids(int(port))[1]
     if not proc:
         return ("<h2><font color='green'>No processes found on this port: "
                 f"</font>{port}</h2>")
