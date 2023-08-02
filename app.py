@@ -326,6 +326,11 @@ def iw_list() -> str:
     return get_iw_list()
 
 
+@app.route("/iwlist-channel")
+def iwlist_channel() -> str:
+    return get_iwlist_channel()
+
+
 @app.route("/iwlist-scan")
 def iwlist_scan() -> str:
     return get_iwlist_scan()

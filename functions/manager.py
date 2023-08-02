@@ -1,3 +1,5 @@
+import subprocess
+
 from . import *
 
 __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
@@ -17,7 +19,8 @@ __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
            'set_kismet', 'set_hashcat_dict', 'set_airoscapy', 'get_hciconfig',
            'start_http_server', 'set_del_tempfiles', 'get_rfkill_list',
            'get_lspci_lsusb', 'get_ip', 'set_tshark', 'set_wireshark',
-           'set_airgeddon', 'set_wifite', 'set_wifiphisher', 'set_waidps']
+           'set_airgeddon', 'set_wifite', 'set_wifiphisher', 'set_waidps',
+           'get_iwlist_channel']
 
 
 def model(cmd, arg):
@@ -139,11 +142,12 @@ def set_add_mon_type_monitor():
 
 
 def get_phy():
-    cmd = 'ifconfig -s'
     result = []
-    out = subprocess.check_output(cmd, shell=True).decode().strip().split('\n')
-    for i in out[1:]:
-        result.append(i.strip().split(' ')[0])
+    cmd = 'iwconfig'
+    out = subprocess.getoutput(cmd).split('\n')
+    for i in out:
+        if 'IEEE' in i:
+            result.append(i.split('IEEE')[0].strip())
     return result
 
 
@@ -169,8 +173,13 @@ def set_mode_managed():
 
 def set_del_mon_interface():
     set_mode_managed()
-    for i in [f'{MON}', 'wlan0mon', 'wlan1mon', 'wlan2mon']:
-        if i in get_phy():
+    phy = get_phy()
+    for i in [MON, 'wlan0mon', 'wlan1mon', 'wlan2mon']:
+        if i in phy:
+            cmd = f"iw dev {i} del"
+            subprocess.call(cmd, shell=True)
+    for i in phy:
+        if i not in ['wlan0', 'wlan1', 'wlan2']:
             cmd = f"iw dev {i} del"
             subprocess.call(cmd, shell=True)
     return "<h2>virtual interface <font color='red'>delete</font></h2>"
@@ -440,6 +449,12 @@ def get_iw_wlan_info() -> str:
 
 def get_iw_dev_info() -> str:
     cmd = "iw dev"
+    result = model(cmd=cmd, arg='')
+    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
+
+
+def get_iwlist_channel() -> str:
+    cmd = "iwlist channel"
     result = model(cmd=cmd, arg='')
     return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
