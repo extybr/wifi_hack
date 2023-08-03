@@ -1,5 +1,3 @@
-import subprocess
-
 from . import *
 
 __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
@@ -20,7 +18,7 @@ __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
            'start_http_server', 'set_del_tempfiles', 'get_rfkill_list',
            'get_lspci_lsusb', 'get_ip', 'set_tshark', 'set_wireshark',
            'set_airgeddon', 'set_wifite', 'set_wifiphisher', 'set_waidps',
-           'get_iwlist_channel']
+           'get_iwlist_channel', 'get_iw_dev_wlan_link']
 
 
 def model(cmd, arg):
@@ -193,11 +191,12 @@ def set_del_tempfiles(path, ext):
 
 
 def set_airodump():
-    if f'{WLAN}mon' and 'type monitor' not in get_iw_dev_info():
+    getout = subprocess.getoutput(f'iw {WLAN}mon info')[10:90]
+    if f'{WLAN}mon' and 'type monitor' not in getout:
         set_mode_managed()
         set_airmon_mode_monitor()
     cmd = (f"gnome-terminal --tab -- bash -c "
-           f"'airodump-ng {WLAN}mon -w {TEMPFOLDER}/airodump'")
+           f"'airodump-ng {WLAN}mon -w {DUMP[:-5]}'")
     result = model(cmd=cmd, arg='')
     return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
 
@@ -243,6 +242,7 @@ def set_wifiphisher():
 
 
 def set_waidps():
+    set_del_mon_interface()
     set_wlan_mode_monitor()
     cmd = f"gnome-terminal --tab -- bash -c 'python2 {WAIDPS} -i {WLAN}'"
     subprocess.run(cmd, shell=True)
@@ -273,10 +273,11 @@ def set_hcxdumptool():
 
 
 def set_hcxpcapngtool():
+    if not Path(DUMP).exists() and Path(DUMP[:-5] + '-01.cap').exists():
+        Path(DUMP[:-5] + '-01.cap').rename(DUMP)
     if Path(DUMP).exists():
         cmd = f'hcxpcapngtool -o {HASH} -E {AP_ST_LIST} {DUMP}'
         subprocess.run(cmd, shell=True)
-        Path(DUMP).rename(f'{DUMP}.pcap')
     if Path(HASH).exists():
         hashes = model(cmd=f'cat {HASH}', arg='')
         data = []
@@ -379,13 +380,22 @@ def get_name_to_mac(name) -> str:
 def get_ifconfig() -> str:
     command = "ifconfig"
     result = subprocess.run(command, capture_output=True).stdout.decode()
-    return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
+    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
 def get_ip() -> str:
     cmd = "ip a"
     result = model(cmd=cmd, arg='')
-    return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
+    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
+
+
+def get_iw_dev_wlan_link() -> str:
+    wlan = get_phy()
+    result = ''
+    for i in wlan:
+        cmd = f"iw dev {i} link"
+        result += '<p>' + model(cmd=cmd, arg='') + '</p>'
+    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
 def get_lspci_lsusb() -> str:
@@ -393,25 +403,25 @@ def get_lspci_lsusb() -> str:
     cmd = ["lspci", "lsusb"]
     for i in cmd:
         result += '<p>' + model(cmd=i, arg='') + '</p>'
-    return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
+    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
 def get_rfkill_list() -> str:
     cmd = "rfkill list all"
     result = model(cmd=cmd, arg='')
-    return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
+    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
 def get_iwconfig() -> str:
     cmd = "iwconfig"
     result = model(cmd=cmd, arg='')
-    return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
+    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
 def get_hciconfig() -> str:
     cmd = "hciconfig -a"
     result = model(cmd=cmd, arg='')
-    return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
+    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
 def get_iwlist_scan() -> str:
@@ -462,7 +472,7 @@ def get_iwlist_channel() -> str:
 def get_networks() -> str:
     cmd = "nmcli dev wifi"
     result = model(cmd=cmd, arg='con')
-    return f"<h3><font color='purple'><pre>{result}</pre></font></h3>"
+    return f"<h2><font color='purple'><pre>{result}</pre></font></h2>"
 
 
 def connecting_wifi() -> str:
@@ -484,11 +494,11 @@ def get_ps() -> str:
 
 def get_uptime() -> str:
     stdout = sys.stdout
-    sys.stdout = subprocess.check_output(
-        'uptime', shell=True).decode('utf-8').strip().split(' ')
-    output = [i for i in sys.stdout]
+    cmd = 'uptime'
+    sys.stdout = subprocess.check_output(cmd, shell=True).decode('utf-8').strip()
+    output = [i for i in sys.stdout.split(' ')]
     sys.stdout = stdout
-    html = f"<h3>Current uptime is <font color='blue'>{output[0]}</font></h3>"
+    html = f"<h2>Current uptime is <font color='blue'>{output[0]}</font></h2>"
     return html
 
 
@@ -497,7 +507,7 @@ def get_ls() -> str:
     for i in ['.', 'functions', 'template', 'tempfiles']:
         cmd = f"ls -lia {i}"
         result += '<p>' + model(cmd=cmd, arg='') + '</p>'
-    return f"<h3><font color='blue'><pre>{result}</pre></font></h3>"
+    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
 def get_pids(port: int) -> (List[int], List[str]):

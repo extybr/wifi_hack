@@ -296,6 +296,11 @@ def ip() -> str:
     return get_ip()
 
 
+@app.route("/iw_dev_wlan_link")
+def iw_dev_wlan_link() -> str:
+    return get_iw_dev_wlan_link()
+
+
 @app.route("/lspci_lsusb")
 def lspci_lsusb() -> str:
     return get_lspci_lsusb()
@@ -375,8 +380,12 @@ def uptime() -> str:
 def get_proc(port) -> str:
     if not str(port).isdigit() or int(port) < 0 or int(port) > 65535:
         return "<h2><font color='brown'>Set port from 0 to 65535</font></h2>"
-    proc = get_pids(int(port))[1]
-    if not proc:
+    processes = get_pids(int(port))[1]
+    if not processes:
         return ("<h2><font color='green'>No processes found on this port: "
                 f"</font>{port}</h2>")
-    return f"<h2><font color='blue'><pre>{proc}</pre></font></h2>"
+    processes.insert(0, 'Process: Pid')
+    pids = ''
+    for process in processes:
+        pids += '<p>' + process + '</p>'
+    return f"<h2><font color='blue'>{pids}</font></h2>"
