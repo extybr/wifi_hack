@@ -1,4 +1,5 @@
 from flask import Flask, render_template, send_from_directory
+from re import match
 from functions import Type, Path, TEMPFOLDER
 from functions.manager import *
 
@@ -67,7 +68,8 @@ def txpower() -> str:
 @app.route('/channel_change/<channel>', methods=['GET'])
 def ch(channel) -> str:
     if not str(channel).isdigit() or int(channel) < 1 or int(channel) > 13:
-        return "<h2><font color='brown'>Set channel from 1 to 13</font></h2>"
+        return ("<h2>Set channel from <font color='brown'>1</font> to "
+                "<font color='brown'>13</font></h2>")
     return change_channel(int(channel))
 
 
@@ -220,15 +222,25 @@ def airoscapy() -> str:
 
 @app.route('/mac_to_wpspin/<address>', methods=['GET'])
 def mac_to_wpspin(address: str) -> str:
-    if len(address) != 12 or [i for i in address if i not in '0123456789abcdefABCDEF']:
-        return '<h2>Example Format: 123456789DF0</h2>'
+    pattern_1 = r'^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$'
+    pattern_2 = r'^([0-9a-fA-F][0-9a-fA-F]-){5}([0-9a-fA-F][0-9a-fA-F])$'
+    pattern_3 = r'^([0-9a-fA-F][0-9a-fA-F]){5}([0-9a-fA-F][0-9a-fA-F])$'
+    message = ('<h2>Example Format: <font color="green">123456789DF0</font>'
+               '<p>Example Format: <font color="green">01:23:45:67:89:AB'
+               '</font></p><p>Example Format: <font color="green">'
+               '01-23-45-67-bc-89</font></p></h2>')
+    result = any([match(i, address) for i in (pattern_1, pattern_2, pattern_3)])
+    if not result:
+        return message
+    address = address.replace(':', '').replace('-', '')
     return get_mac_to_wpspin(address)
 
 
 @app.route('/name_to_mac/<name>')
 def name_to_mac(name: str) -> str:
     if name == '<name>':
-        return '<h2>Example: ESSID<p>Example: ASUS-777</p></h2>'
+        return ('<h2>Example: <font color="green">ESSID</font>'
+                '<p>Example: <font color="green">ASUS-777</font></p></h2>')
     return get_name_to_mac(name)
 
 
@@ -379,7 +391,8 @@ def uptime() -> str:
 @app.route("/free_port/<port>", methods=['GET'])
 def get_proc(port) -> str:
     if not str(port).isdigit() or int(port) < 0 or int(port) > 65535:
-        return "<h2><font color='brown'>Set port from 0 to 65535</font></h2>"
+        return ("<h2>Set port from <font color='brown'>0</font> to "
+                "<font color='brown'>65535</font></h2>")
     processes = get_pids(int(port))[1]
     if not processes:
         return ("<h2><font color='green'>No processes found on this port: "
