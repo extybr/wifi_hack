@@ -224,7 +224,7 @@ def airoscapy() -> str:
 def mac_to_wpspin(address: str) -> str:
     pattern_1 = r'^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$'
     pattern_2 = r'^([0-9a-fA-F][0-9a-fA-F]-){5}([0-9a-fA-F][0-9a-fA-F])$'
-    pattern_3 = r'^([0-9a-fA-F][0-9a-fA-F]){5}([0-9a-fA-F][0-9a-fA-F])$'
+    pattern_3 = r'^([0-9a-fA-F][0-9a-fA-F]){6}$'
     message = ('<h2>Example Format: <font color="green">123456789DF0</font>'
                '<p>Example Format: <font color="green">01:23:45:67:89:AB'
                '</font></p><p>Example Format: <font color="green">'
@@ -232,8 +232,10 @@ def mac_to_wpspin(address: str) -> str:
     result = any([match(i, address) for i in (pattern_1, pattern_2, pattern_3)])
     if not result:
         return message
-    address = address.replace(':', '').replace('-', '')
-    return get_mac_to_wpspin(address)
+    mac = address.replace(':', '').replace('-', '')
+    wpspin = get_mac_to_wpspin(mac)
+    return (f"<h2>Mac: <font color='blue'>{address}</font>. "
+            f"WPSPIN: <font color='blue'>{wpspin}</font></h2>")
 
 
 @app.route('/name_to_mac/<name>')

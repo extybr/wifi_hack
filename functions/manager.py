@@ -273,22 +273,26 @@ def set_hcxdumptool():
 
 
 def set_hcxpcapngtool():
+    result = output = ''
     if not Path(DUMP).exists() and Path(DUMP[:-5] + '-01.cap').exists():
         Path(DUMP[:-5] + '-01.cap').rename(DUMP)
     if Path(DUMP).exists():
         cmd = f'hcxpcapngtool -o {HASH} -E {AP_ST_LIST} {DUMP}'
-        subprocess.run(cmd, shell=True)
+        output = model(cmd=cmd, arg='')
     if Path(HASH).exists():
         hashes = model(cmd=f'cat {HASH}', arg='')
         data = []
         with open(HASH, 'r') as text:
             for line in text:
                 data.append(line.split('*'))
-        result = '<p>List of found routers:</p><ul>'
+        ap = '<p>List of found routers:</p><ul>'
         for item in data:
             word = bytes.fromhex(item[5]).decode()
-            result += f'<li>{word}</li>'
-        return f"<h2>{hashes}<font color='green'>{result}</font></h2></ul>"
+            ap += f'<li>{word}</li>'
+        result += (f"<h2>{hashes}<font color='green'>{ap}</font></ul>"
+                   f"<p><pre>{output}</pre></h2></p>")
+        Path(HASH).rename(HASH[:-10] + 'old_' + HASH[-10:])
+        return result
     return "<h2><font color='red'>NOT FOUND</font></h2>"
 
 
@@ -363,7 +367,7 @@ def get_mac_to_wpspin(mac: str) -> str:
     var2 = (one * 10) + ((10 - (var1 % 10)) % 10)
     var3 = str(int(var2))
     wpspin = var3.zfill(8)
-    return f"<h2>Mac: {mac}. WPSPIN: <font color='blue'>{wpspin}</font></h2>"
+    return wpspin
 
 
 def get_name_to_mac(name) -> str:
