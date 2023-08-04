@@ -1,6 +1,7 @@
 
 > A set of programs in the Aircrack-ng package:
-    airmon-ng, airodump-ng, airbase, aireplay: <a href='https://github.com/aircrack-ng/aircrack-ng'>https://github.com/aircrack-ng/aircrack-ng</a>
+    airmon-ng, airodump-ng, airbase, aireplay: 
+    <a href='https://github.com/aircrack-ng/aircrack-ng'>https://github.com/aircrack-ng/aircrack-ng</a>
 > mdk4: <a href='https://github.com/aircrack-ng/mdk4'>https://github.com/aircrack-ng/mdk4</a>
 > mdk3: <a href='https://github.com/charlesxsh/mdk3-master'>https://github.com/charlesxsh/mdk3-master</a>
 > wifite: <a href='https://github.com/derv82/wifite2'>https://github.com/derv82/wifite2</a>
@@ -14,4 +15,30 @@
 > kismet: <a href='https://github.com/kismetwireless/kismet'>https://github.com/kismetwireless/kismet</a>
 > horst: <a href='https://github.com/br101/horst'>https://github.com/br101/horst</a>
 > wireshark, tshark: <a href='https://github.com/wireshark/wireshark'>https://github.com/wireshark/wireshark</a>
+
+################################################################
+Getting Started and Troubleshooting:
+fix scapy: instal scapy3.2.2 version
+# cd wifi
+# pip freeze
+# pip install -r requirements.txt
+# apt upgrade
+# apt install aircrack-ng
+# apt install mdk4
+# apt install mdk3
+# apt install wifite
+# apt install wifiphisher
+# apt install pyrit
+# apt install airgeddon
+# apt install hashcat
+# apt install kismet
+# apt install horst
+# apt install wireshark
+# git clone https://github.com/ZerBea/hcxdumptool tempfiles/
+# git clone https://github.com/SYWorks/waidps tempfiles/
+
+################################################################
+program start example:
+# ./start.sh
+
 
