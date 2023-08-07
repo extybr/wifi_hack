@@ -18,7 +18,7 @@ __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
            'start_http_server', 'set_del_tempfiles', 'get_rfkill_list',
            'get_lspci_lsusb', 'get_ip', 'set_tshark', 'set_wireshark',
            'set_airgeddon', 'set_wifite', 'set_wifiphisher', 'set_waidps',
-           'get_iwlist_channel', 'get_iw_dev_wlan_link']
+           'get_iwlist_channel', 'get_iw_dev_wlan_link', 'connecting_aps_wifi']
 
 
 def model(cmd, arg):
@@ -48,13 +48,14 @@ def change_power():
            f"iwconfig {WLAN} txpower 30",
            f"ifconfig {WLAN} up"]
     [subprocess.call(i, shell=True) for i in cmd]
-    return f"<h2><font color='green'>txpower {WLAN} changed</h2></font>"
+    return f"<h2>txpower {WLAN} <font color='green'>changed</h2></font>"
 
 
 def change_channel(ch: int):
     cmd = f"iwconfig {WLAN} channel {ch}"
     subprocess.call(cmd, shell=True)
-    return f"<h2><font color='green'>channel {WLAN} changed on </font>{ch}</h2>"
+    return (f"<h2>channel {WLAN} <font color='green'>changed </font>on "
+            f"<font color='red'>{ch}</font></h2>")
 
 
 def network_manager_stop():
@@ -483,6 +484,15 @@ def connecting_wifi() -> str:
     cmd = f"nmcli dev wifi con '{AP}' password {PASS}"
     result = model(cmd=cmd, arg='')
     return f"<h2><font color='green'><pre>{result}</pre></font></h2>"
+
+
+def connecting_aps_wifi() -> str:
+    for ap, passwd in AP_PASS.items():
+        cmd = f"nmcli dev wifi con '{ap}' password {passwd}"
+        result = model(cmd=cmd, arg='')
+        if result:
+            return f"<h2><font color='green'><pre>{result}</pre></font></h2>"
+    return "<h2><font color='red'>NOT CONNECTING</font></h2>"
 
 
 def start_http_server() -> str:

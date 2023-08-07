@@ -1,5 +1,6 @@
 WLAN, MON = 'wlan1', 'mon0'
-AP, PASS = 'Router', '12345678'
+AP, PASS = 'HOME', '12345678'
+AP_PASS = {'Router_1': '12345678', 'Router_2': '12345678'}
 TEMPFOLDER = 'tempfiles'
 DUMP = f'{TEMPFOLDER}/dumpfile.pcap'
 HASH = f'{TEMPFOLDER}/22000.hash'

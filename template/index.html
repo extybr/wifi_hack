@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/normalize.css">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="template/css/normalize.css">
+  <link rel="stylesheet" href="template/css/style.css">
   <title>wifi hacking</title>
 </head>
 
@@ -70,8 +70,11 @@
         </h2>
         <ul class="card-list">
           <li class="items-list">
-            <a href="/wifi-ap-connect" target="_blank">connect to AP</a>
-          </li>	
+            <a href="/wifi-home-connect" target="_blank">connect to HOME-AP</a>
+          </li>
+          <li class="items-list">
+            <a href="/wifi-ap-to-ap-connect" target="_blank">connect to APS</a>
+          </li>
           <li class="items-list">
             <a href="/http_server" target="_blank">http server (port: 80)</a>
           </li>	
@@ -97,6 +100,9 @@
             <a href="/wpa_supplicant_status" target="_blank">get wpa_supplicant status</a>
           </li>
           <li class="items-list">
+            <a href="/free_port/<int:port>" target="_blank">free port</a>
+          </li>
+          <li class="items-list">
             <a href="/ps" target="_blank">ps</a>
           </li>
           <li class="items-list">
@@ -105,9 +111,6 @@
           <li class="items-list">
             <a href="/uptime" target="_blank">uptime</a>
           </li>
-          <li class="items-list">
-            <a href="/free_port/<int:port>" target="_blank">free port</a>
-          </li>	
           <li class="items-list">
           </li>
         </ul>

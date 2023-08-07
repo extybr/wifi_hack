@@ -5,8 +5,6 @@ from functions.manager import *
 
 root_path = Path().cwd()
 template_path = Path(root_path) / 'template'
-css_path = Path(template_path) / 'css'
-img_path = Path(template_path) / 'img'
 app = Flask(__name__, template_folder=template_path)
 
 
@@ -38,21 +36,16 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/template/<path:path>')
+def send_template(path):
+    return send_from_directory(template_path, path)
+
+
 @app.route('/help')
 def md_help():
     with open('template/help.md', 'r', encoding='utf-8') as text:
         man = text.read()
     return f"<h1><font color='blue'><pre>{man}</pre></font></h1>"
-
-
-@app.route('/css/<path:path>')
-def send_css(path):
-    return send_from_directory(css_path, path)
-
-
-@app.route('/img/<path:path>')
-def send_img(path):
-    return send_from_directory(img_path, path)
 
 
 @app.route('/mac_change')
@@ -365,9 +358,14 @@ def nmcli() -> str:
     return get_networks()
 
 
-@app.route("/wifi-ap-connect")
+@app.route("/wifi-home-connect")
 def connect_wifi() -> str:
     return connecting_wifi()
+
+
+@app.route("/wifi-ap-to-ap-connect")
+def connect_ap_to_ap_wifi() -> str:
+    return connecting_aps_wifi()
 
 
 @app.route("/http_server")
