@@ -153,6 +153,21 @@ def waidps() -> str:
     return set_waidps()
 
 
+@app.route('/wifijammer')
+def wifijammer() -> str:
+    return set_wifijammer()
+
+
+@app.route('/fake-ap')
+def fake_ap() -> str:
+    return set_fake_ap()
+
+
+@app.route('/fluxion')
+def fluxion() -> str:
+    return set_fluxion()
+
+
 @app.route('/pyrit_striplive')
 def pyrit_striplive() -> str:
     return set_pyrit_striplive()
@@ -211,6 +226,11 @@ def sniffer() -> str:
 @app.route('/start_script_airoscapy')
 def airoscapy() -> str:
     return set_airoscapy()
+
+
+@app.route('/scapy-lan-scan')
+def lan_scan() -> str:
+    return set_scapy_lan_scan()
 
 
 @app.route('/mac_to_wpspin/<address>', methods=['GET'])

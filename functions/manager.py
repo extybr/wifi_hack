@@ -18,7 +18,8 @@ __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
            'start_http_server', 'set_del_tempfiles', 'get_rfkill_list',
            'get_lspci_lsusb', 'get_ip', 'set_tshark', 'set_wireshark',
            'set_airgeddon', 'set_wifite', 'set_wifiphisher', 'set_waidps',
-           'get_iwlist_channel', 'get_iw_dev_wlan_link', 'connecting_aps_wifi']
+           'get_iwlist_channel', 'get_iw_dev_wlan_link', 'connecting_aps_wifi',
+           'set_fluxion', 'set_wifijammer', 'set_fake_ap', 'set_scapy_lan_scan']
 
 
 def model(cmd, arg):
@@ -250,6 +251,25 @@ def set_waidps():
     return "<h2><font color='red'>FINISH</font></h2>"
 
 
+def set_wifijammer():
+    set_wlan_mode_monitor()
+    cmd = f"gnome-terminal --tab -- bash -c 'python2 {WIFIJAMMER}'"
+    subprocess.run(cmd, shell=True)
+    return "<h2><font color='red'>FINISH</font></h2>"
+
+
+def set_fake_ap():
+    cmd = f"gnome-terminal --tab -- bash -c 'python2 {FAKEAP} -c 1 -e 'FREE*WIFI''"
+    subprocess.run(cmd, shell=True)
+    return "<h2><font color='red'>FINISH</font></h2>"
+
+
+def set_fluxion():
+    cmd = f"gnome-terminal --tab -- bash -c 'cd {FLUXION} && ./fluxion.sh'"
+    subprocess.run(cmd, shell=True)
+    return "<h2><font color='red'>FINISH</font></h2>"
+
+
 def set_pyrit_striplive():
     set_mode_managed()
     set_wlan_mode_monitor()
@@ -355,6 +375,14 @@ def set_airoscapy():
            f"'python2 functions/airoscapy.py {WLAN}'")
     subprocess.run(cmd, shell=True)
     return "<h2><font color='red'>FINISH</font></h2>"
+
+
+def set_scapy_lan_scan():
+    cmd = "python3 functions/scapy-scan.py"
+    result = subprocess.getoutput(cmd)
+    if result:
+        return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
+    return "<h2><font color='red'>NOT FOUND</font></h2>"
 
 
 def get_mac_to_wpspin(mac: str) -> str:

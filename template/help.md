@@ -7,6 +7,8 @@
 > wifite: <a href='https://github.com/derv82/wifite2'>https://github.com/derv82/wifite2</a>
 > wifiphisher: <a href='https://github.com/sophron/wifiphisher'>https://github.com/sophron/wifiphisher</a>
 > waidps: <a href='https://github.com/SYWorks/waidps'>https://github.com/SYWorks/waidps</a>
+> wifijammer: <a href='https://github.com/DanMcInerney/wifijammer'>https://github.com/DanMcInerney/wifijammer</a>
+> fluxion: <a href='https://github.com/FluxionNetwork/fluxion'>https://github.com/FluxionNetwork/fluxion</a>
 > pyrit: <a href='https://github.com/JPaulMora/Pyrit'>https://github.com/JPaulMora/Pyrit</a>
 > airgeddon: <a href='https://github.com/v1s1t0r1sh3r3/airgeddon'>https://github.com/v1s1t0r1sh3r3/airgeddon</a>
 > hcxdumptool: <a href='https://github.com/ZerBea/hcxdumptool'>https://github.com/ZerBea/hcxdumptool</a>
@@ -36,6 +38,8 @@ fix scapy: instal scapy3.2.2 version
 # apt install wireshark
 # git clone https://github.com/ZerBea/hcxdumptool tempfiles/
 # git clone https://github.com/SYWorks/waidps tempfiles/
+# git clone https://github.com/DanMcInerney/wifijammer tempfiles/
+# git clone https://github.com/FluxionNetwork/fluxion tempfiles/
 
 ################################################################
 program start example:
