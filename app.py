@@ -333,6 +333,11 @@ def lspci_lsusb() -> str:
 @app.route("/rfkill_list")
 def rfkill() -> str:
     return get_rfkill_list()
+    
+    
+@app.route("/iw_reg_get")
+def iw_reg_get() -> str:
+    return get_iw_reg_get()
 
 
 @app.route("/hciconfig")

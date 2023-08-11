@@ -19,7 +19,8 @@ __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
            'get_lspci_lsusb', 'get_ip', 'set_tshark', 'set_wireshark',
            'set_airgeddon', 'set_wifite', 'set_wifiphisher', 'set_waidps',
            'get_iwlist_channel', 'get_iw_dev_wlan_link', 'connecting_aps_wifi',
-           'set_fluxion', 'set_wifijammer', 'set_fake_ap', 'set_scapy_lan_scan']
+           'set_fluxion', 'set_wifijammer', 'set_fake_ap', 'set_scapy_lan_scan', 
+           'get_iw_reg_get']
 
 
 def model(cmd, arg):
@@ -46,7 +47,7 @@ def change_mac():
 def change_power():
     cmd = [f"ifconfig {WLAN} down",
            "iw reg set BZ",
-           f"iwconfig {WLAN} txpower 30",
+           f"iw dev {WLAN} set txpower fixed 3000",
            f"ifconfig {WLAN} up"]
     [subprocess.call(i, shell=True) for i in cmd]
     return f"<h2>txpower {WLAN} <font color='green'>changed</h2></font>"
@@ -456,6 +457,12 @@ def get_lspci_lsusb() -> str:
 
 def get_rfkill_list() -> str:
     cmd = "rfkill list all"
+    result = model(cmd=cmd, arg='')
+    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
+    
+    
+def get_iw_reg_get() -> str:
+    cmd = "iw reg get"
     result = model(cmd=cmd, arg='')
     return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
