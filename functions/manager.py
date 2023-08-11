@@ -52,11 +52,26 @@ def change_power():
     return f"<h2>txpower {WLAN} <font color='green'>changed</h2></font>"
 
 
-def change_channel(ch: int):
-    cmd = f"iwconfig {WLAN} channel {ch}"
-    subprocess.call(cmd, shell=True)
-    return (f"<h2>channel {WLAN} <font color='green'>changed </font>on "
-            f"<font color='red'>{ch}</font></h2>")
+def change_channel(ch):
+    message = ("<h2>Set channel from <font color='brown'>1</font> to "
+               "<font color='brown'>14</font> for <font color='green'>"
+               "2.4</font>GHz.</h2>")
+    output = subprocess.getoutput(f'iwlist {WLAN} channel | grep "5.7 GHz"')
+    if output:
+        message += ("<h2><p>Set channel from <font color='brown'>36"
+                    "</font> to <font color='brown'>64 </font>and from "
+                    "<font color='brown'>100</font> to <font color='brown'>177"
+                    "</font> for <font color='green'>5.8</font>GHz.</p></h2>")
+    if str(ch).isdigit():
+        low = 0 < int(ch) < 15
+        middle = 35 < int(ch) < 65
+        high = 99 < int(ch) < 178
+        if low or middle or high:
+            cmd = f"iwconfig {WLAN} channel {ch}"
+            subprocess.call(cmd, shell=True)
+            return (f"<h2>channel {WLAN} <font color='green'>changed </font>on "
+                    f"<font color='red'>{ch}</font></h2>")
+    return message
 
 
 def network_manager_stop():

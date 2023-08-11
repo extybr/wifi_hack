@@ -60,10 +60,7 @@ def txpower() -> str:
 
 @app.route('/channel_change/<channel>', methods=['GET'])
 def ch(channel) -> str:
-    if not str(channel).isdigit() or int(channel) < 1 or int(channel) > 13:
-        return ("<h2>Set channel from <font color='brown'>1</font> to "
-                "<font color='brown'>13</font></h2>")
-    return change_channel(int(channel))
+    return change_channel(channel)
 
 
 @app.route('/airmon-ng_check')
