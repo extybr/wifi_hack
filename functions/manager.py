@@ -1,3 +1,5 @@
+import subprocess
+
 from . import *
 
 __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
@@ -20,7 +22,8 @@ __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
            'set_airgeddon', 'set_wifite', 'set_wifiphisher', 'set_waidps',
            'get_iwlist_channel', 'get_iw_dev_wlan_link', 'connecting_aps_wifi',
            'set_fluxion', 'set_wifijammer', 'set_fake_ap', 'set_scapy_lan_scan', 
-           'get_iw_reg_get']
+           'get_iw_reg_get', 'set_add_wlanXmon_type_monitor',
+           'get_cat_proc_net_dev', 'get_ls_sys_class_net', 'set_aireplay_inject']
 
 
 def model(cmd, arg):
@@ -155,6 +158,12 @@ def set_add_mon_type_monitor():
     cmd = f"iw {WLAN} interface add {MON} type monitor"
     subprocess.call(cmd, shell=True)
     return f"<h2>{WLAN} added mon mode <font color='red'>monitor</font></h2>"
+    
+    
+def set_add_wlanXmon_type_monitor():
+    cmd = f"iw {WLAN} interface add {WLAN}mon type monitor"
+    subprocess.call(cmd, shell=True)
+    return f"<h2>{WLAN} added {WLAN}mon mode <font color='red'>monitor</font></h2>"
 
 
 def get_phy():
@@ -205,18 +214,21 @@ def set_del_tempfiles(path, ext):
     for i in ext:
         files = Path(path).glob(f"*.{i}")
         [Path(file).unlink() for file in files]
+    kismet_files = Path().cwd().glob(f'*.{ext[0]}')
+    for file in kismet_files:
+        Path(file).unlink()
     return "<h2><font color='red'>remove </font>tempfiles</h2>"
 
 
 def set_airodump():
-    getout = subprocess.getoutput(f'iw {WLAN}mon info')[10:90]
-    if f'{WLAN}mon' and 'type monitor' not in getout:
+    getout = subprocess.getoutput(f'iw {WLAN} info')[10:90]
+    if f'{WLAN}' and 'type monitor' not in getout:
         set_mode_managed()
-        set_airmon_mode_monitor()
+        set_wlan_set_type_monitor()
     cmd = (f"gnome-terminal --tab -- bash -c "
-           f"'airodump-ng {WLAN}mon -w {DUMP[:-5]}'")
-    result = model(cmd=cmd, arg='')
-    return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
+           f"'airodump-ng {WLAN} -w {DUMP[:-5]}'")
+    model(cmd=cmd, arg='')
+    return "<h2><font color='red'>FINISH</font></h2>"
 
 
 def set_airbase_fake_ap():
@@ -245,6 +257,13 @@ def set_aireplay_deauthentication():
     # cmd = f"xterm -e aireplay-ng -0 0 -D {WLAN}"
     [model(cmd=f"xterm -e aireplay-ng -0 5 -a {i} {WLAN}", arg='') for i in mac]
     return "<h2><font color='red'>FINISH</font></h2>"
+
+
+def set_aireplay_inject():
+    set_wlan_mode_monitor()
+    cmd = f"gnome-terminal --tab -- bash -c 'aireplay-ng -9 {WLAN}'"
+    result = model(cmd, '')
+    return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
 
 
 def set_wifite():
@@ -354,6 +373,7 @@ def set_kismet():
 
 
 def set_horst():
+    set_wlan_set_type_monitor()
     cmd = f"gnome-terminal --tab -- bash -c 'horst -i {WLAN}'"
     subprocess.run(cmd, shell=True)
     return "<h2><font color='red'>FINISH</font></h2>"
@@ -520,6 +540,18 @@ def get_iw_dev_info() -> str:
 
 def get_iwlist_channel() -> str:
     cmd = "iwlist channel"
+    result = model(cmd=cmd, arg='')
+    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
+
+
+def get_cat_proc_net_dev() -> str:
+    cmd = "cat /proc/net/dev"
+    result = model(cmd=cmd, arg='')
+    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
+
+
+def get_ls_sys_class_net() -> str:
+    cmd = "ls -l /sys/class/net"
     result = model(cmd=cmd, arg='')
     return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 

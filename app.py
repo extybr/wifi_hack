@@ -91,6 +91,11 @@ def wlan_set_type_monitor() -> str:
 @app.route('/add_mon_type_monitor')
 def add_mon_type_monitor() -> str:
     return set_add_mon_type_monitor()
+    
+    
+@app.route('/add_wlanXmon_type_monitor')
+def add_wlanXmon_type_monitor() -> str:
+    return set_add_wlanXmon_type_monitor()
 
 
 @app.route('/wlan_mode_managed')
@@ -133,6 +138,11 @@ def mdk4_deauthentication() -> str:
 @app.route('/aireplay_deauthentication_all_channel')
 def aireplay_deauthentication() -> str:
     return set_aireplay_deauthentication()
+
+
+@app.route('/aireplay_inject')
+def aireplay_inject() -> str:
+    return set_aireplay_inject()
 
 
 @app.route('/wifite-reaver')
@@ -373,6 +383,16 @@ def iwlist_scan() -> str:
 @app.route("/iwlist_wlan_scan_ssid")
 def iwlist_wlan_scan_ssid() -> str:
     return get_iwlist_wlan_scan_ssid()
+
+
+@app.route("/cat_proc_net_dev")
+def cat_proc_net_dev() -> str:
+    return get_cat_proc_net_dev()
+
+
+@app.route("/ls_sys_class_net")
+def ls_sys_class_net() -> str:
+    return get_ls_sys_class_net()
 
 
 @app.route("/nmcli")
