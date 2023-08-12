@@ -79,6 +79,9 @@
             <a href="/wifi-ap-to-ap-connect" target="_blank">connect to APS</a>
           </li>
           <li class="items-list">
+            <a href="/create-ap" target="_blank">create ap</a>
+          </li>
+          <li class="items-list">
             <a href="/http_server" target="_blank">http server (port: 80)</a>
           </li>	
           <li class="items-list">
@@ -88,10 +91,10 @@
             <a href="/NetworkManager_start" target="_blank">start the NetworkManager service</a>
           </li>
           <li class="items-list">
-            <a href="/NetworkManager_status" target="_blank">get service NetworkManager status</a>
+            <a href="/NetworkManager_read_conf" target="_blank">read service NetworkManager config</a>
           </li>
           <li class="items-list">
-            <a href="/NetworkManager_read_conf" target="_blank">read service NetworkManager config</a>
+            <a href="/NetworkManager_wpa_supplicant_status" target="_blank">status service NetworkManager, wpa_supplicant</a>
           </li>
           <li class="items-list">
             <a href="/wpa_supplicant_stop" target="_blank">stop the wpa_supplicant</a>
@@ -100,19 +103,16 @@
             <a href="/wpa_supplicant_start" target="_blank">start the wpa_supplicant</a>
           </li>
           <li class="items-list">
-            <a href="/wpa_supplicant_status" target="_blank">get wpa_supplicant status</a>
-          </li>
-          <li class="items-list">
             <a href="/free_port/<int:port>" target="_blank">free port</a>
           </li>
           <li class="items-list">
-            <a href="/ps" target="_blank">ps</a>
+            <a href="/ps_uptime" target="_blank">ps, uptime</a>
+          </li>
+          <li class="items-list">
+            <a href="/route-netstat" target="_blank">ip route, netstat -ntu</a>
           </li>
           <li class="items-list">
             <a href="/ls" target="_blank">ls</a>
-          </li>
-          <li class="items-list">
-            <a href="/uptime" target="_blank">uptime</a>
           </li>
           <li class="items-list">
           </li>
@@ -196,13 +196,10 @@
         </h2>
         <ul class="card-list">
           <li class="items-list">
-            <a href="/iwconfig" target="_blank">iwconfig</a>
+            <a href="/iwconfig-hciconfig" target="_blank">iwconfig, hciconfig</a>
           </li>
           <li class="items-list">
             <a href="/ifconfig" target="_blank">ifconfig</a>
-          </li>
-          <li class="items-list">
-            <a href="/hciconfig" target="_blank">hciconfig</a>
           </li>
           <li class="items-list">
             <a href="/ip_a" target="_blank">ip a</a>

@@ -17,6 +17,7 @@
 > kismet: <a href='https://github.com/kismetwireless/kismet'>https://github.com/kismetwireless/kismet</a>
 > horst: <a href='https://github.com/br101/horst'>https://github.com/br101/horst</a>
 > wireshark, tshark: <a href='https://github.com/wireshark/wireshark'>https://github.com/wireshark/wireshark</a>
+> create ap: <a href='https://github.com/oblique/create_ap'>https://github.com/oblique/create_ap</a>
 
 ################################################################
 Getting Started and Troubleshooting:
@@ -40,6 +41,7 @@ fix scapy: instal scapy3.2.2 version
 # git clone https://github.com/SYWorks/waidps tempfiles/
 # git clone https://github.com/DanMcInerney/wifijammer tempfiles/
 # git clone https://github.com/FluxionNetwork/fluxion tempfiles/
+# git clone https://github.com/oblique/create_ap (cd create_ap, make install)
 
 ################################################################
 program start example:

@@ -1,29 +1,28 @@
-import subprocess
-
 from . import *
 
 __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
            'network_manager_start', 'get_network_manager_status', 'get_ls',
-           'get_uptime', 'connecting_wifi', 'get_networks', 'get_ifconfig',
-           'get_iwconfig', 'change_power', 'get_airmon_check', 'free_port',
-           'set_airmon_check_kill', 'set_airmon_mode_monitor', 'set_airodump',
-           'set_hcxdumptool', 'set_mode_managed', 'get_pids', 'get_iw_list',
-           'get_iwlist_scan', 'get_iw_wlan_info', 'set_wlan_mode_monitor',
-           'set_wlan_set_type_monitor', 'set_add_mon_type_monitor', 'get_ps',
-           'get_iw_dev_info', 'set_del_mon_interface', 'set_hcxpcapngtool',
-           'set_wpa_supplicant_stop', 'set_wpa_supplicant_start', 'set_sniffer',
-           'get_wpa_supplicant_status', 'set_hashcat_mask', 'get_mac_to_wpspin',
-           'get_name_to_mac', 'get_iwlist_wlan_scan_ssid', 'set_mdk3_fake_ap',
-           'set_airbase_fake_ap', 'set_mdk4_deauthentication', 'change_channel',
+           'get_ps_uptime', 'connecting_wifi', 'get_networks', 'get_ifconfig',
+           'get_iwconfig_hciconfig', 'change_power', 'get_airmon_check',
+           'free_port', 'set_airmon_check_kill', 'set_airmon_mode_monitor',
+           'set_airodump', 'set_hcxdumptool', 'set_mode_managed', 'get_pids',
+           'get_iw_list', 'get_iwlist_scan', 'get_iw_wlan_info', 'set_wifite',
+           'set_wlan_mode_monitor', 'set_wlan_set_type_monitor', 'set_fake_ap',
+           'set_add_mon_type_monitor', 'get_iw_dev_info', 'get_ip',
+           'set_del_mon_interface', 'set_hcxpcapngtool', 'set_aireplay_inject',
+           'set_wpa_supplicant_stop', 'set_wpa_supplicant_start',
+           'set_sniffer', 'get_wpa_supplicant_status', 'set_hashcat_mask',
+           'get_mac_to_wpspin', 'get_name_to_mac', 'get_iwlist_wlan_scan_ssid',
+           'set_mdk3_fake_ap', 'set_airbase_fake_ap', 'get_route_netstat',
+           'set_mdk4_deauthentication', 'change_channel', 'set_hashcat_dict',
            'set_aireplay_deauthentication', 'set_pyrit_striplive', 'set_horst',
-           'set_kismet', 'set_hashcat_dict', 'set_airoscapy', 'get_hciconfig',
-           'start_http_server', 'set_del_tempfiles', 'get_rfkill_list',
-           'get_lspci_lsusb', 'get_ip', 'set_tshark', 'set_wireshark',
-           'set_airgeddon', 'set_wifite', 'set_wifiphisher', 'set_waidps',
+           'set_kismet', 'set_airoscapy', 'start_http_server', 'set_waidps',
+           'set_del_tempfiles', 'get_rfkill_list', 'get_lspci_lsusb',
+           'set_tshark', 'set_wireshark', 'set_airgeddon', 'set_wifiphisher',
            'get_iwlist_channel', 'get_iw_dev_wlan_link', 'connecting_aps_wifi',
-           'set_fluxion', 'set_wifijammer', 'set_fake_ap', 'set_scapy_lan_scan', 
-           'get_iw_reg_get', 'set_add_wlanXmon_type_monitor',
-           'get_cat_proc_net_dev', 'get_ls_sys_class_net', 'set_aireplay_inject']
+           'set_scapy_lan_scan', 'set_fluxion', 'get_cat_proc_net_dev',
+           'set_wifijammer',  'get_iw_reg_get', 'set_add_wlanXmon_type_monitor',
+           'get_ls_sys_class_net', 'set_create_ap']
 
 
 def model(cmd, arg):
@@ -262,8 +261,8 @@ def set_aireplay_deauthentication():
 def set_aireplay_inject():
     set_wlan_mode_monitor()
     cmd = f"gnome-terminal --tab -- bash -c 'aireplay-ng -9 {WLAN}'"
-    result = model(cmd, '')
-    return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
+    result = model(cmd=cmd, arg='')
+    return "<h2><font color='red'>FINISH</font></h2>"
 
 
 def set_wifite():
@@ -460,10 +459,12 @@ def get_ip() -> str:
 
 def get_iw_dev_wlan_link() -> str:
     wlan = get_phy()
-    result = ''
+    result = '<b>***** iw dev wlan link *****</b>'
     for i in wlan:
         cmd = f"iw dev {i} link"
         result += '<p>' + model(cmd=cmd, arg='') + '</p>'
+    cmd = 'nmcli dev status'
+    result += f'<b>***** {cmd} *****</b><p>' + model(cmd=cmd, arg='') + '</p>'
     return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
@@ -471,7 +472,7 @@ def get_lspci_lsusb() -> str:
     result = ''
     cmd = ["lspci", "lsusb"]
     for i in cmd:
-        result += '<p>' + model(cmd=i, arg='') + '</p>'
+        result += f'<b>***** {i} *****</b><p>' + model(cmd=i, arg='') + '</p>'
     return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
@@ -487,15 +488,19 @@ def get_iw_reg_get() -> str:
     return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
-def get_iwconfig() -> str:
-    cmd = "iwconfig"
-    result = model(cmd=cmd, arg='')
+def get_iwconfig_hciconfig() -> str:
+    result = ''
+    cmd = ["iwconfig", "hciconfig -a"]
+    for i in cmd:
+        result += f'<b>***** {i} *****</b><p>' + model(cmd=i, arg='') + '</p>'
     return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
-def get_hciconfig() -> str:
-    cmd = "hciconfig -a"
-    result = model(cmd=cmd, arg='')
+def get_route_netstat() -> str:
+    result = ''
+    cmd = ["ip route", "netstat -ntu"]
+    for i in cmd:
+        result += f'<b>***** {i} *****</b><p>' + model(cmd=i, arg='') + '</p>'
     return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
@@ -512,7 +517,6 @@ def get_iw_list() -> str:
 
 
 def get_iwlist_wlan_scan_ssid() -> str:
-    # cmd = "iwlist scan | grep Address"
     cmd = "iwlist scan | grep ESSID"
     sys.stdout = subprocess.check_output(cmd, shell=True).decode('utf-8')
     output = '\n'.join(sys.stdout.split('\n'))
@@ -577,32 +581,35 @@ def connecting_aps_wifi() -> str:
     return "<h2><font color='red'>NOT CONNECTING</font></h2>"
 
 
+def set_create_ap() -> str:
+    cmd = (f"gnome-terminal --window -- bash -c "
+           f"'create_ap {WLAN} eth0 MyAP password'")
+    model(cmd=cmd, arg='')
+    return "<h2><font color='red'>FINISH</font></h2>"
+
+
 def start_http_server() -> str:
     cmd = "gnome-terminal --window -- bash -c 'python3 -m http.server 80'"
     result = model(cmd=cmd, arg='')
     return f"<h2><font color='green'><pre>{result}</pre></font></h2>"
 
 
-def get_ps() -> str:
-    result = model(cmd="ps", arg='arg')
-    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
-
-
-def get_uptime() -> str:
+def get_ps_uptime() -> str:
     stdout = sys.stdout
     cmd = 'uptime'
     sys.stdout = subprocess.check_output(cmd, shell=True).decode('utf-8').strip()
     output = [i for i in sys.stdout.split(' ')]
     sys.stdout = stdout
-    html = f"<h2>Current uptime is <font color='blue'>{output[0]}</font></h2>"
-    return html
+    uptime = f"<h2>Current uptime is <font color='blue'>{output[0]}</font></h2>"
+    result = uptime + model(cmd="ps", arg='arg')
+    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 
 def get_ls() -> str:
     result = ''
     for i in ['.', 'functions', 'template', 'tempfiles']:
         cmd = f"ls -lia {i}"
-        result += '<p>' + model(cmd=cmd, arg='') + '</p>'
+        result += f'<b>***** {i} *****</b><p>' + model(cmd=cmd, arg='') + '</p>'
     return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
 
 

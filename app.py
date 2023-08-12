@@ -276,18 +276,6 @@ def nm_start() -> str:
     return network_manager_start()
 
 
-@app.route('/NetworkManager_status')
-def nm_status():
-    result = get_network_manager_status()[135:163]
-    color = 'grey'
-    if 'dead' in result:
-        color = 'red'
-    elif 'running' in result:
-        color = 'green'
-    return (f'<h2>NetworkManager status: <font color="{color}">'
-            f'{result}</font></h2>')
-
-
 @app.route('/NetworkManager_read_conf')
 def nm_read() -> str:
     return network_manager_read_conf()
@@ -303,21 +291,36 @@ def wpa_supplicant_start() -> str:
     return set_wpa_supplicant_start()
 
 
-@app.route('/wpa_supplicant_status')
-def wpa_supplicant_status():
-    result = get_wpa_supplicant_status()[135:164]
+def status(service):
     color = 'grey'
-    if 'dead' in result:
+    if 'dead' in service:
         color = 'red'
-    elif 'running' in result:
+    elif 'running' in service:
         color = 'green'
-    return (f'<h2>WPA SUPPLICANT status: <font color="{color}">'
-            f'{result}</font></h2>')
+    return color
 
 
-@app.route("/iwconfig")
-def iwconfig() -> str:
-    return get_iwconfig()
+@app.route('/NetworkManager_wpa_supplicant_status')
+def nm_wpa_supplicant_status():
+    result_nm = get_network_manager_status()[135:163]
+    result_wss = get_wpa_supplicant_status()[135:164]
+    color_nm = status(result_nm)
+    color_wss = status(result_wss)
+    nm = (f'<h2>NetworkManager status: <font color="{color_nm}">'
+          f'{result_nm}</font></h2>')
+    wss = (f'<h2><p>WPA SUPPLICANT status: <font color="{color_wss}">'
+           f'{result_wss}</font></p></h2>')
+    return nm + wss
+
+
+@app.route("/iwconfig-hciconfig")
+def iwconfig_hciconfig() -> str:
+    return get_iwconfig_hciconfig()
+
+
+@app.route("/route-netstat")
+def route_netstat() -> str:
+    return get_route_netstat()
 
 
 @app.route("/ifconfig")
@@ -348,11 +351,6 @@ def rfkill() -> str:
 @app.route("/iw_reg_get")
 def iw_reg_get() -> str:
     return get_iw_reg_get()
-
-
-@app.route("/hciconfig")
-def hciconfig() -> str:
-    return get_hciconfig()
 
 
 @app.route("/iw-wlan-info")
@@ -410,24 +408,24 @@ def connect_ap_to_ap_wifi() -> str:
     return connecting_aps_wifi()
 
 
+@app.route("/create-ap")
+def create_ap() -> str:
+    return set_create_ap()
+
+
 @app.route("/http_server")
 def http_server() -> str:
     return start_http_server()
 
 
-@app.route("/ps")
-def ps() -> str:
-    return get_ps()
+@app.route("/ps_uptime")
+def ps_uptime() -> str:
+    return get_ps_uptime()
 
 
 @app.route("/ls")
 def ls() -> str:
     return get_ls()
-
-
-@app.route("/uptime")
-def uptime() -> str:
-    return get_uptime()
 
 
 @app.route("/free_port/<port>", methods=['GET'])
