@@ -497,8 +497,14 @@ def get_iwconfig_hciconfig() -> str:
 
 
 def get_route_netstat() -> str:
-    result = ''
-    cmd = ["ip route", "netstat -ntu"]
+    try:
+        cmd = "ip -h -br a | grep UP"
+        sys.stdout = subprocess.check_output(cmd, shell=True).decode('utf-8')
+        result = '\n'.join(sys.stdout.split('\n'))
+        result = f'<b>***** {cmd} *****</b><p>' + result + '</p>'
+    except subprocess.CalledProcessError:
+        result = ''
+    cmd = ["curl https://api.ipify.org", "ip route", "netstat -ntu"]
     for i in cmd:
         result += f'<b>***** {i} *****</b><p>' + model(cmd=i, arg='') + '</p>'
     return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
