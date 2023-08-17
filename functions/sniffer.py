@@ -9,7 +9,7 @@ PROBE_REQUEST_SUBTYPE = 4
 
 
 class iSniffer(object):
-    def __init__(self, iface='en1', whitelist=None, verbose=False):
+    def __init__(self, iface='wlan0', whitelist=None, verbose=False):
         if not whitelist:
             whitelist = ['00:00:00:00:00:00', ]
         self.iface = iface
@@ -56,7 +56,7 @@ class iSniffer(object):
 
         p = pkt[Dot11Elt]
         capability = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.cap%}"
-                          "{Dot11ProbeResp:%Dot11ProbeResp.cap%}").split('+')
+                                 "{Dot11ProbeResp:%Dot11ProbeResp.cap%}").split('+')
         crypto = set()
         while isinstance(p, Dot11Elt):
             if p.ID == 48:
@@ -72,7 +72,8 @@ class iSniffer(object):
         enc = '/'.join(crypto)
         if bssid not in self.aps:
             self.aps[bssid] = (channel, essid, bssid, enc, rssi)
-            print("[+] New AP {0:5}\t{1:20}\t{2:20}\t{3:5}\t{4:4}".format(channel, essid, bssid, enc, rssi))
+            print("[+] New AP {0:5}\t{1:20}\t{2:20}\t{3:5}\t{4:4}".format(
+                channel, essid, bssid, enc, rssi))
 
     def pkt_handler(self, pkt):
         if pkt.type == PROBE_REQUEST_TYPE and pkt.subtype == PROBE_REQUEST_SUBTYPE:
@@ -85,7 +86,9 @@ class iSniffer(object):
         sniff(iface=self.iface,
               prn=self.pkt_handler,
               # lfilter=lambda p: p.haslayer(Dot11))
-              lfilter=lambda p: p.haslayer(Dot11Beacon) or p.haslayer(Dot11ProbeResp) or p.haslayer(Dot11ProbeReq))
+              lfilter=lambda p: p.haslayer(Dot11Beacon) or
+                                p.haslayer(Dot11ProbeResp) or
+                                p.haslayer(Dot11ProbeReq))
 
     def stat(self):
         print('\nAP list:')
@@ -97,7 +100,8 @@ class iSniffer(object):
 if __name__ == '__main__':
     parser = ArgumentParser('iSniff', description='Tiny iSniff for RFMON under OS X',
                             formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-i', '--interface', default='en1', required=False, help='Interface to used')
+    parser.add_argument('-i', '--interface', default='wlan0', required=False,
+                        help='Interface to used')
     args = parser.parse_args()
     isniff = iSniffer(args.interface)
     isniff.sniff()

