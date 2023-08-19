@@ -140,6 +140,11 @@ def mdk3_fake_ap() -> str:
     return set_mdk3_fake_ap()
 
 
+@app.route('/send_beacon')
+def send_beacon() -> str:
+    return set_send_beacon()
+
+
 @app.route('/mdk4_deauthentication_all_channel')
 def mdk4_deauthentication() -> str:
     return set_mdk4_deauthentication()
@@ -245,6 +250,21 @@ def airoscapy() -> str:
     return set_airoscapy()
 
 
+@app.route('/tshark_wlan_beacon')
+def tshark_wlan_beacony() -> str:
+    return set_tshark_wlan_beacon()
+
+
+@app.route('/tcpdump_pnl')
+def tcpdump_pnl() -> str:
+    return set_tcpdump_pnl()
+
+
+@app.route('/tcpdump_eapol')
+def tcpdump_eapol() -> str:
+    return set_tcpdump_eapol()
+
+
 @app.route('/scapy-lan-scan')
 def lan_scan() -> str:
     return set_scapy_lan_scan()
@@ -277,13 +297,13 @@ def name_to_mac(name: str) -> str:
 
 
 @app.route('/NetworkManager_stop')
-def nm_stop() -> str:
-    return network_manager_stop()
+def network_manager_stop() -> str:
+    return network_manager_start_stop(0)
 
 
 @app.route('/NetworkManager_start')
-def nm_start() -> str:
-    return network_manager_start()
+def network_manager_start() -> str:
+    return network_manager_start_stop(1)
 
 
 @app.route('/NetworkManager_read_conf')
@@ -293,12 +313,12 @@ def nm_read() -> str:
 
 @app.route('/wpa_supplicant_stop')
 def wpa_supplicant_stop() -> str:
-    return set_wpa_supplicant_stop()
+    return set_wpa_supplicant_start_stop(0)
 
 
 @app.route('/wpa_supplicant_start')
 def wpa_supplicant_start() -> str:
-    return set_wpa_supplicant_start()
+    return set_wpa_supplicant_start_stop(1)
 
 
 def status(service):
@@ -316,11 +336,11 @@ def nm_wpa_supplicant_status():
     result_wss = get_wpa_supplicant_status()[135:164]
     color_nm = status(result_nm)
     color_wss = status(result_wss)
-    nm = (f'<h2>NetworkManager status: <font color="{color_nm}">'
-          f'{result_nm}</font></h2>')
-    wss = (f'<h2><p>WPA SUPPLICANT status: <font color="{color_wss}">'
-           f'{result_wss}</font></p></h2>')
-    return nm + wss
+    stat = (f'<h2>NetworkManager status: <font color="{color_nm}">'
+            f'{result_nm}</font></h2>')
+    stat += (f'<h2><p>WPA SUPPLICANT status: <font color="{color_wss}">'
+             f'{result_wss}</font></p></h2>')
+    return stat
 
 
 @app.route("/iwconfig-hciconfig")

@@ -141,6 +141,13 @@ li:last-child {
   color: #3f2aff;
 }
 
+.list-title {
+  padding: 0 0 0 20px;
+  margin: 0;
+  font-weight: 700;
+  color: #3f2aff;
+}
+
 .modules-list {
   display: flex;
   flex-wrap: wrap;
@@ -161,7 +168,7 @@ li:last-child {
   vertical-align: top;
   margin-right: 25px;
   width: 472px;
-  height: 840px;
+  height: 700px;
   filter: drop-shadow(0px 0px 40px rgba(0, 0, 0, 0.1));
   background-color: #fff;
   background-position: top;
@@ -176,7 +183,7 @@ li:last-child {
   display: inline-block;
   vertical-align: top;
   width: 472px;
-  height: 840px;
+  height: 700px;
   filter: drop-shadow(0px 0px 40px rgba(0, 0, 0, 0.1));
   background-color: #fff;
   background-position: top;
@@ -192,7 +199,7 @@ li:last-child {
   vertical-align: top;
   margin-right: 25px;
   width: 472px;
-  height: 600px;
+  height: 1000px;
   filter: drop-shadow(0px 0px 40px rgba(0, 0, 0, 0.1));
   background-color: #fff;
   background-position: top;
@@ -207,7 +214,7 @@ li:last-child {
   display: inline-block;
   vertical-align: top;
   width: 472px;
-  height: 600px;
+  height: 1000px;
   filter: drop-shadow(0px 0px 40px rgba(0, 0, 0, 0.1));
   background-color: #fff;
   background-position: top;
