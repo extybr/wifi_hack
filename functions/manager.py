@@ -1,6 +1,8 @@
+import subprocess
+
 from . import *
 
-__all__ = ['network_manager_read_conf', 'change_mac', 'set_tcpdump_eapol',
+__all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol',
            'network_manager_start_stop', 'get_network_manager_status', 'get_ls',
            'get_ps_uptime', 'connecting_wifi', 'get_networks', 'get_ifconfig',
            'get_iwconfig_hciconfig', 'change_power', 'get_airmon_check',
@@ -108,10 +110,52 @@ def get_network_manager_status():
     return model(cmd=cmd, arg='')
 
 
-def network_manager_read_conf():
-    cmd = 'cat /etc/NetworkManager/NetworkManager.conf'
-    result = model(cmd=cmd, arg='')
-    return get_html('black', result)
+def mac_address_config(text):
+    with open('/etc/NetworkManager/conf.d/mac.conf', 'w') as mac:
+        mac.write(text)
+    restart = 'systemctl restart NetworkManager'
+    subprocess.run(restart, shell=True)
+    result = '<h2><p><font color="green">OK</font></p>'
+    cat = 'cat /etc/NetworkManager/conf.d/mac.conf'
+    name = f'<b><font color="blue">***** {cat[4:]} *****</font></b><p><pre>'
+    result += name + model(cmd=cat, arg='') + '</pre></p></h2>'
+    return result
+
+
+def network_manager_read_change_conf(var):
+    variable = {'not-random': '[device]\nwifi.scan-rand-mac-address=no',
+                'random': '[connection]\nethernet.cloned-mac-address=random'
+                          '\nwifi.cloned-mac-address=random',
+                'stable': '[connection]\nethernet.cloned-mac-address=stable'
+                          '\nwifi.cloned-mac-address=stable'}
+    result = (f'<h2>Example:<p><a href="/NetworkManager_read_or_change_conf'
+              f'/random">random</a> - generate random mac address '
+              f'({variable["random"][48:]})</p><p><a href="/NetworkManager_'
+              f'read_or_change_conf/not-random">not-random</a> - not generate '
+              f'random mac address ({variable["not-random"][9:]})</p><p>'
+              f'<a href="/NetworkManager_read_or_change_conf/stable">stable'
+              f'</a> - stable mac address ({variable["stable"][48:]})</p>')
+    if var == '<choice>':
+        cmd = 'cat /etc/NetworkManager/NetworkManager.conf'
+        name = f'<b><font color="blue">***** {cmd[4:]} *****</font></b><p><pre>'
+        result += name + model(cmd=cmd, arg='') + '</pre></p></h2>'
+        if Path('/etc/NetworkManager/conf.d/mac.conf').exists():
+            cmd = 'cat /etc/NetworkManager/conf.d/mac.conf'
+            name = (f'<h2><b><font color="blue">***** {cmd[4:]} *****</font>'
+                    f'</b><p><pre>')
+            result += name + model(cmd=cmd, arg='') + '</pre></p></h2>'
+        elif not Path('/etc/NetworkManager/conf.d/mac.conf').exists():
+            if not Path('/etc/NetworkManager/conf.d').exists():
+                cmd = ['mkdir /etc/NetworkManager/conf.d',
+                       'touch /etc/NetworkManager/conf.d/mac.conf']
+                [subprocess.run(i, shell=True) for i in cmd]
+            else:
+                cmd = 'touch /etc/NetworkManager/conf.d/mac.conf'
+                subprocess.run(cmd, shell=True)
+        return result
+    elif var in variable:
+        result = mac_address_config(variable[var])
+    return result
 
 
 def set_wpa_supplicant_start_stop(action):

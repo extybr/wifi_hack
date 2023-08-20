@@ -316,9 +316,9 @@ def network_manager_start() -> str:
     return network_manager_start_stop(1)
 
 
-@app.route('/NetworkManager_read_conf')
-def nm_read() -> str:
-    return network_manager_read_conf()
+@app.route('/NetworkManager_read_or_change_conf/<choice>')
+def network_manager_read_change(choice) -> str:
+    return network_manager_read_change_conf(choice)
 
 
 @app.route('/wpa_supplicant_stop')
