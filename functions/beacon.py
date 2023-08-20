@@ -1,11 +1,18 @@
 #!/usr/bin/python3
 from scapy.all import *
 from sys import argv
-from functions.manager import set_new_mac
+from random import random
 
 iface = argv[1]
 essid = argv[2]
 INTERVAL = 0.05
+
+
+def set_new_mac():
+    src = list(map(lambda x: "%02x".upper() % int(random() * 0xFF), range(5)))
+    new_mac = "00:" + ':'.join(src)
+    return new_mac
+
 
 source = set_new_mac()
 target = 'ff:ff:ff:ff:ff:ff'

@@ -140,9 +140,9 @@ def mdk3_fake_ap() -> str:
     return set_mdk3_fake_ap()
 
 
-@app.route('/send_beacon')
-def send_beacon() -> str:
-    return set_send_beacon()
+@app.route('/scapy_beacon')
+def scapy_beacon() -> str:
+    return set_scapy_beacon()
 
 
 @app.route('/mdk4_deauthentication_all_channel')
@@ -153,6 +153,11 @@ def mdk4_deauthentication() -> str:
 @app.route('/aireplay_deauthentication_all_channel')
 def aireplay_deauthentication() -> str:
     return set_aireplay_deauthentication()
+
+
+@app.route('/scapy_deauthentication_all_channel')
+def scapy_deauthentication() -> str:
+    return set_scapy_deauthentication()
 
 
 @app.route('/aireplay_inject')
@@ -258,6 +263,11 @@ def tshark_wlan_beacony() -> str:
 @app.route('/tcpdump_pnl')
 def tcpdump_pnl() -> str:
     return set_tcpdump_pnl()
+
+
+@app.route('/scapy_wifi_scan')
+def scapy_wifi_scan() -> str:
+    return set_scapy_scan()
 
 
 @app.route('/tcpdump_eapol')
