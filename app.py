@@ -6,6 +6,7 @@ from functions.manager import *
 root_path = Path().cwd()
 template_path = Path(root_path) / 'template'
 app = Flask(__name__, template_folder=template_path)
+mkdir()
 
 
 @app.errorhandler(404)
@@ -42,7 +43,7 @@ def send_template(path):
 
 
 @app.route('/help')
-def md_help():
+def md_help() -> str:
     with open('template/help.md', 'r', encoding='utf-8') as text:
         man = text.read()
     return f"<h1><font color='blue'><pre>{man}</pre></font></h1>"
@@ -59,7 +60,7 @@ def txpower() -> str:
 
 
 @app.route('/channel_change/<channel>', methods=['GET'])
-def ch(channel) -> str:
+def ch(channel: str) -> str:
     return change_channel(channel)
 
 
@@ -111,7 +112,7 @@ def delete_interface() -> str:
 @app.route('/tempfiles_delete')
 def delete_tempfiles() -> str:
     path = Path(TEMPFOLDER)
-    ext = ['kismet', 'hash', 'log', 'pcap', 'cap', 'csv', 'netxml']
+    ext = ['kismet', 'hash', 'pcap', 'cap', 'csv', 'netxml', 'log', 'conf']
     return set_del_tempfiles(path, ext)
 
 
@@ -317,7 +318,7 @@ def network_manager_start() -> str:
 
 
 @app.route('/NetworkManager_read_or_change_conf/<choice>')
-def network_manager_read_change(choice) -> str:
+def network_manager_read_change(choice: str) -> str:
     return network_manager_read_change_conf(choice)
 
 
@@ -331,7 +332,7 @@ def wpa_supplicant_start() -> str:
     return set_wpa_supplicant_start_stop(1)
 
 
-def status(service):
+def status(service: str) -> str:
     color = 'grey'
     if 'dead' in service:
         color = 'red'
@@ -341,7 +342,7 @@ def status(service):
 
 
 @app.route('/NetworkManager_wpa_supplicant_status')
-def nm_wpa_supplicant_status():
+def nm_wpa_supplicant_status() -> str:
     result_nm = get_network_manager_status()[135:163]
     result_wss = get_wpa_supplicant_status()[135:164]
     color_nm = status(result_nm)
@@ -418,6 +419,11 @@ def iwlist_scan() -> str:
     return get_iwlist_scan()
 
 
+@app.route("/iw_scan_main")
+def iw_scan_main() -> str:
+    return get_iw_scan()
+
+
 @app.route("/iwlist_wlan_scan_ssid")
 def iwlist_wlan_scan_ssid() -> str:
     return get_iwlist_wlan_scan_ssid()
@@ -469,7 +475,7 @@ def ls() -> str:
 
 
 @app.route("/free_port/<port>", methods=['GET'])
-def get_proc(port) -> str:
+def get_proc(port: str) -> str:
     if not str(port).isdigit() or int(port) < 0 or int(port) > 65535:
         return ("<h2>Set port from <font color='brown'>0</font> to "
                 "<font color='brown'>65535</font></h2>")
@@ -494,6 +500,28 @@ def dmesg_wlan() -> str:
     return get_dmesg_wlan()
 
 
-@app.route("/connecting_default_pass")
-def connecting_default_pass() -> str:
-    return connecting_aps()
+@app.route("/single_brute_ap/<essid>")
+def single_brute_ap(essid: str) -> str:
+    if essid == '<essid>':
+        message = ('<h2>Enter the name of the Access Point<p>Example Format: '
+                   '<font color="green">ASUS-007</font></p></h2>')
+        return message
+    return set_single_brute_ap(essid)
+
+
+@app.route("/multi_brute_ap/<level>")
+def multi_brute_ap(level: str) -> str:
+    pattern = r'\d\d-\d\d'
+    message = ('<h2>Signal level interval<p>Example Format: '
+               '<font color="green">00-30</font></p><p>Example Format: '
+               '<font color="green">55-57</font></p><p>Example: '
+               '<a href="/multi_brute_ap/30-33">multi_brute_ap/30-33</a></p></h2>')
+    result = match(pattern, level)
+    if result and (int(level[:2]) < int(level[-2:])):
+        return set_multi_brute_ap(level)
+    return message
+
+
+@app.route("/brute_width_ap")
+def brute_width_ap() -> str:
+    return set_brute_width_ap()
