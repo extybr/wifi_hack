@@ -26,7 +26,8 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'set_airodump_manufacturer_uptime_wps', 'get_dmesg_wlan',
            'set_airodump_channel_36_177', 'set_tcpdump_pnl', 'get_iw_scan',
            'set_scapy_beacon', 'set_scapy_deauthentication', 'set_scapy_scan',
-           'set_single_brute_ap', 'set_multi_brute_ap', 'set_brute_width_ap']
+           'set_single_brute_ap', 'set_multi_brute_ap', 'set_brute_width_ap',
+           'set_nmap_lan_scan']
 
 FINISH = "<h2><font color='red'>FINISH</font></h2>"
 NOT_FOUND = "<h2><font color='red'>NOT FOUND</font></h2>"
@@ -541,11 +542,38 @@ def set_scapy_scan() -> str:
     return FINISH
 
 
+def get_iface_up():
+    try:
+        result = subprocess.getoutput('ip -h -br a | grep UP')
+        if result:
+            rs = result.split('\n')
+            string_result = ' '.join(i.split()[2] for i in rs)
+            list_result = [i.split()[2] for i in rs]
+            return result, string_result, list_result
+    except subprocess.CalledProcessError:
+        return
+
+
 def set_scapy_lan_scan() -> str:
-    cmd = f"python3 {LAN_SCAN}"
-    result = subprocess.getoutput(cmd)
-    if result:
-        return get_html('blue', result)
+    up_iface = get_iface_up()
+    if up_iface:
+        cmd = f"python3 {LAN_SCAN} '{up_iface[1]}'"
+        result = subprocess.getoutput(cmd)
+        if result:
+            return get_html('blue', result)
+    return NOT_FOUND
+
+
+def set_nmap_lan_scan() -> str:
+    result = ''
+    up_iface = get_iface_up()
+    if up_iface:
+        for net in up_iface[2]:
+            result += f'<b>**** {net} ****</b>'
+            cmd = f"nmap -n {net}"
+            result += '<p>' + subprocess.getoutput(cmd) + '</p>'
+        if result:
+            return get_html('blue', result)
     return NOT_FOUND
 
 
@@ -626,15 +654,13 @@ def get_iwconfig_hciconfig() -> str:
 
 
 def get_route_netstat() -> str:
-    try:
+    result = ''
+    iface_up = get_iface_up()
+    if iface_up:
         cmd = "ip -h -br a | grep UP"
-        sys.stdout = subprocess.check_output(cmd, shell=True).decode('utf-8')
-        result = '\n'.join(sys.stdout.split('\n'))
-        result = f'<b>***** {cmd} *****</b><p>' + result + '</p>'
-    except subprocess.CalledProcessError:
-        result = ''
-    cmd = ["curl https://api.ipify.org", "ip route", "netstat -ntu"]
-    for i in cmd:
+        result = f'<b>***** {cmd} *****</b><p>{iface_up[0]}</p>'
+    command = ["curl https://api.ipify.org", "ip route", "netstat -ntu"]
+    for i in command:
         result += f'<b>***** {i} *****</b><p>' + model(cmd=i, arg='') + '</p>'
     return get_html('blue', result)
 
@@ -826,6 +852,16 @@ def set_multi_brute_ap(level_signal: str) -> str:
     for thread in threads:
         thread.join()
     return FINISH
+
+# def set_multi_brute_ap(level_signal: str) -> str:
+#     from multiprocessing import Process
+#     aps_list: list = get_list_essid(level_signal)
+#     for ap in aps_list:
+#         p = Process(target=set_single_brute_ap, args=(ap,))
+#         p.start()
+#         p.join()
+#         p.kill()
+#     return FINISH
 
 
 def set_brute_width_ap() -> str:

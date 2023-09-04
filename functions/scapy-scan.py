@@ -1,7 +1,13 @@
 import scapy.all as scapy
+from sys import argv
+
+net = argv[1].split()
+print(*net, sep=' | ')
+mac = []
 
 
 def scan(ip):
+    global mac
     arp_request = scapy.ARP(pdst=ip)
     broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
     arp_request_broadcast = broadcast / arp_request
@@ -11,8 +17,11 @@ def scan(ip):
         print(head)
         for element in answered_list:
             result = element[1].psrc + "\t\t" + element[1].hwsrc + "\n"
-            print(result + "-" * 42)
+            if element[1].hwsrc not in mac:
+                print(result + "-" * 42)
+            mac.append(element[1].hwsrc)
 
 
-scan("192.168.1.1/24")
-scan("192.168.0.1/24")
+[scan(i) for i in net]
+# scan("192.168.0.1/24")
+# scan("192.168.1.1/24")

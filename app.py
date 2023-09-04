@@ -281,6 +281,11 @@ def lan_scan() -> str:
     return set_scapy_lan_scan()
 
 
+@app.route('/nmap-lan-scan')
+def nmap_scan() -> str:
+    return set_nmap_lan_scan()
+
+
 @app.route('/mac_to_wpspin/<address>', methods=['GET'])
 def mac_to_wpspin(address: str) -> str:
     pattern_1 = r'^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$'
