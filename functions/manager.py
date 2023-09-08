@@ -451,18 +451,32 @@ def set_hcxpcapngtool() -> str:
     return NOT_FOUND
 
 
+def get_hash() -> str:
+    old = HASH[:-10] + 'old_' + HASH[-10:]
+    if Path(HASH).exists() or Path(old).exists():
+        _hash = HASH if Path(HASH).exists() else old
+        return _hash
+    return ''
+
+
 def set_hashcat_mask() -> str:
-    cmd = (f"gnome-terminal --tab -- bash -c 'hashcat -m 22000 {HASH} "
-           f"-a 3 ?d?d?d?d?d?d?d?d'")
-    subprocess.run(cmd, shell=True)
-    return FINISH
+    _hash = get_hash()
+    if _hash:
+        cmd = (f"gnome-terminal --tab -- bash -c 'hashcat -m 22000 {_hash} "
+               f"-a 3 ?d?d?d?d?d?d?d?d'")
+        subprocess.run(cmd, shell=True)
+        return FINISH
+    return NOT_FOUND
 
 
 def set_hashcat_dict() -> str:
-    cmd = (f"gnome-terminal --tab -- bash -c 'hashcat -m 22000 "
-           f"{HASH} {DICTIONARY}'")
-    subprocess.run(cmd, shell=True)
-    return FINISH
+    _hash = get_hash()
+    if _hash:
+        cmd = (f"gnome-terminal --tab -- bash -c 'hashcat -m 22000 "
+               f"{_hash} {DICTIONARY}'")
+        subprocess.run(cmd, shell=True)
+        return FINISH
+    return NOT_FOUND
 
 
 def set_kismet() -> str:
@@ -771,7 +785,7 @@ def get_ps_uptime() -> str:
     output = [i for i in sys.stdout.split(' ')]
     sys.stdout = stdout
     uptime = f"<h2>Current uptime is <font color='blue'>{output[0]}</font></h2>"
-    result = uptime + model(cmd="ps", arg='arg')
+    result = uptime + model(cmd="ps auf", arg='')
     return get_html('blue', result)
 
 
@@ -834,15 +848,36 @@ def get_list_essid(level: str) -> list:
     return aps
 
 
-def set_single_brute_ap(ssid: str) -> str:
-    set_mode_managed()
-    cmd = (f"gnome-terminal --window -- bash -c 'python3 {BRUTE_PY} {WLAN} "
-           f"\"{ssid}\" {DEFAULT_PASS} {WPATMP}'")
+def get_mac(ssid, count=5):
+    if count:
+        cmd = f"nmcli dev wifi | egrep '{ssid}'"
+        result = subprocess.getoutput(cmd).split('\n')
+        if result:
+            return result[0].strip().split(' ')[0]
+        count -= 1
+        sleep(3)
+        get_mac(ssid, count)
+    return
+
+
+def set_single_brute_ap(ssid: str, wpa_equals_wps=False) -> str:
+    """
+    The parameter adds verification of the wpa password
+    from the default wps code. May slow initial startup.
+    """
+    wpspin = 0
+    if wpa_equals_wps:
+        mac = get_mac(ssid)
+        if mac:
+            wpspin = get_mac_to_wpspin(mac.replace(':', '').replace('-', ''))
+    cmd = (f"gnome-terminal --window -- bash -c 'python3 {BRUTE_PY} {WLAN}"
+           f" \"{ssid}\" {DEFAULT_PASS} {WPATMP} {wpspin}'")
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
 def set_multi_brute_ap(level_signal: str) -> str:
+    set_mode_managed()
     threads: list[Thread] = []
     aps_list: list = get_list_essid(level_signal)
     for ap in aps_list:
@@ -852,16 +887,6 @@ def set_multi_brute_ap(level_signal: str) -> str:
     for thread in threads:
         thread.join()
     return FINISH
-
-# def set_multi_brute_ap(level_signal: str) -> str:
-#     from multiprocessing import Process
-#     aps_list: list = get_list_essid(level_signal)
-#     for ap in aps_list:
-#         p = Process(target=set_single_brute_ap, args=(ap,))
-#         p.start()
-#         p.join()
-#         p.kill()
-#     return FINISH
 
 
 def set_brute_width_ap() -> str:

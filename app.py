@@ -511,7 +511,7 @@ def single_brute_ap(essid: str) -> str:
         message = ('<h2>Enter the name of the Access Point<p>Example Format: '
                    '<font color="green">ASUS-007</font></p></h2>')
         return message
-    return set_single_brute_ap(essid)
+    return set_single_brute_ap(essid, wpa_equals_wps=True)
 
 
 @app.route("/multi_brute_ap/<level>")

