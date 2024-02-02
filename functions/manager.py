@@ -113,7 +113,7 @@ def network_manager_start_stop(action: int | bool) -> str:
 
 
 def get_network_manager_status() -> str:
-    cmd = 'service NetworkManager status'
+    cmd = 'systemctl is-active NetworkManager'
     return model(cmd=cmd, arg='')
 
 
@@ -167,7 +167,7 @@ def network_manager_read_change_conf(var: str) -> str:
 
 def set_wpa_supplicant_start_stop(action: int | bool) -> str:
     if not action:
-        if 'running' in get_network_manager_status()[135:163]:
+        if 'inactive' not in get_network_manager_status():
             return ("<h2><font color='red'>First you need to stop service "
                     "</font>NetworkManager</h2>")
         cmd = 'systemctl stop wpa_supplicant.service'
@@ -179,7 +179,7 @@ def set_wpa_supplicant_start_stop(action: int | bool) -> str:
 
 
 def get_wpa_supplicant_status():
-    cmd = 'systemctl status wpa_supplicant.service'
+    cmd = 'systemctl is-active wpa_supplicant'
     return model(cmd=cmd, arg='')
 
 
@@ -220,8 +220,8 @@ def set_add_mon_type_monitor() -> str:
     cmd = f"iw {WLAN} interface add {MON} type monitor"
     subprocess.call(cmd, shell=True)
     return f"<h2>{WLAN} added mon mode <font color='red'>monitor</font></h2>"
-    
-    
+
+
 def set_add_wlanXmon_type_monitor() -> str:
     cmd = f"iw {WLAN} interface add {WLAN}mon type monitor"
     subprocess.call(cmd, shell=True)
@@ -651,8 +651,8 @@ def get_rfkill_list() -> str:
     cmd = "rfkill list all"
     result = model(cmd=cmd, arg='')
     return get_html('blue', result)
-    
-    
+
+
 def get_iw_reg_get() -> str:
     cmd = "iw reg get"
     result = model(cmd=cmd, arg='')

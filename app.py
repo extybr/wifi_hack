@@ -339,17 +339,17 @@ def wpa_supplicant_start() -> str:
 
 def status(service: str) -> str:
     color = 'grey'
-    if 'dead' in service:
+    if 'inactive' in service:
         color = 'red'
-    elif 'running' in service:
+    elif 'active' in service:
         color = 'green'
     return color
 
 
 @app.route('/NetworkManager_wpa_supplicant_status')
 def nm_wpa_supplicant_status() -> str:
-    result_nm = get_network_manager_status()[135:163]
-    result_wss = get_wpa_supplicant_status()[135:164]
+    result_nm = get_network_manager_status()
+    result_wss = get_wpa_supplicant_status()
     color_nm = status(result_nm)
     color_wss = status(result_wss)
     stat = (f'<h2>NetworkManager status: <font color="{color_nm}">'
