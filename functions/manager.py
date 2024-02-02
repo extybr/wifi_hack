@@ -81,15 +81,19 @@ def change_power() -> str:
 
 
 def change_channel(ch: str) -> str:
-    message = ("<h2>Set channel from <font color='brown'>1</font> to "
+    message = ("<html><h2>Set channel from <font color='brown'>1</font> to "
                "<font color='brown'>14</font> for <font color='green'>"
-               "2.4</font>GHz.</h2>")
+               "2.4</font>GHz.")
     output = subprocess.getoutput(f'iwlist {WLAN} channel | grep "5.7 GHz"')
     if output:
-        message += ("<h2><p>Set channel from <font color='brown'>36"
+        message += ("<p>Set channel from <font color='brown'>36"
                     "</font> to <font color='brown'>64 </font>and from "
                     "<font color='brown'>100</font> to <font color='brown'>177"
-                    "</font> for <font color='green'>5.8</font>GHz.</p></h2>")
+                    "</font> for <font color='green'>5.8</font>GHz.</p>")
+    message += ('<div><form method="post"><br><label for="name-ch">Channel: '
+                '</label><input id="name-ch" name="ch" type="text" '
+                'maxlength="3"> <button type="submit">submit</button>'
+                '</br></form></div></h2></html>')
     if str(ch).isdigit():
         low = 0 < int(ch) < 15
         middle = 35 < int(ch) < 65
