@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, request
 from re import match
 from functions import Type, Path, TEMPFOLDER
 from functions.manager import *
@@ -59,8 +59,10 @@ def txpower() -> str:
     return change_power()
 
 
-@app.route('/channel_change/<channel>', methods=['GET'])
+@app.route('/channel_change/<channel>', methods=['GET', 'POST'])
 def ch(channel: str) -> str:
+    if request.method == 'POST':
+        channel = f"{request.form['ch']}"
     return change_channel(channel)
 
 
@@ -286,15 +288,21 @@ def nmap_scan() -> str:
     return set_nmap_lan_scan()
 
 
-@app.route('/mac_to_wpspin/<address>', methods=['GET'])
+@app.route('/mac_to_wpspin/<address>', methods=['GET', 'POST'])
 def mac_to_wpspin(address: str) -> str:
     pattern_1 = r'^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$'
     pattern_2 = r'^([0-9a-fA-F][0-9a-fA-F]-){5}([0-9a-fA-F][0-9a-fA-F])$'
     pattern_3 = r'^([0-9a-fA-F][0-9a-fA-F]){6}$'
-    message = ('<h2>Example Format: <font color="green">123456789DF0</font>'
-               '<p>Example Format: <font color="green">01:23:45:67:89:AB'
-               '</font></p><p>Example Format: <font color="green">'
-               '01-23-45-67-bc-89</font></p></h2>')
+    message = ('<html><h2>Example Format: <font color="green">123456789DF0'
+               '</font><p>Example Format: <font color="green">'
+               '01:23:45:67:89:AB</font></p><p>Example Format: '
+               '<font color="green">01-23-45-67-bc-89</font></p>')
+    message += ('<div><form method="post"><br><label for="name-mac">MAC: '
+                '</label><input id="name-mac" name="mac" type="text" '
+                'maxlength="17"> <button type="submit">submit</button>'
+                '</br></form></div></h2></html>')
+    if request.method == 'POST':
+        address = f"{request.form['mac']}"
     result = any([match(i, address) for i in (pattern_1, pattern_2, pattern_3)])
     if not result:
         return message
@@ -304,12 +312,19 @@ def mac_to_wpspin(address: str) -> str:
             f"WPSPIN: <font color='blue'>{wpspin}</font></h2>")
 
 
-@app.route('/name_to_mac/<name>')
+@app.route('/name_to_mac/<name>', methods=["GET", "POST"])
 def name_to_mac(name: str) -> str:
-    if name == '<name>':
-        return ('<h2>Example: <font color="green">ESSID</font>'
-                '<p>Example: <font color="green">ASUS-777</font></p></h2>')
-    return get_name_to_mac(name)
+    if request.method == "POST":
+        name = f"{request.form['ap']}"
+    elif name == '<name>':
+        html = ('<html><h2>Example: <font color="green">ESSID</font>'
+                '<p>Example: <font color="green">ASUS-777</font></p>')
+        html += ('<div><form method="post"><br><label for="name-ap">AP: '
+                 '</label><input id="name-ap" name="ap" type="text"> '
+                 '<button type="submit">submit</button></br></form></div>'
+                 '</h2></html>')
+        return html
+    return get_name_to_mac(name.strip())
 
 
 @app.route('/NetworkManager_stop')
@@ -479,11 +494,18 @@ def ls() -> str:
     return get_ls()
 
 
-@app.route("/free_port/<port>", methods=['GET'])
+@app.route("/free_port/<port>", methods=['GET', 'POST'])
 def get_proc(port: str) -> str:
+    message = ("<html><h2>Set port from <font color='brown'>0</font> to "
+               "<font color='brown'>65535</font>")
+    message += ('<div><form method="post"><br><label for="name-port">Port: '
+                '</label><input id="name-port" name="port" type="text" '
+                'maxlength="5"> <button type="submit">submit</button>'
+                '</br></form></div></h2></html>')
+    if request.method == 'POST':
+        port = f"{request.form['port']}"
     if not str(port).isdigit() or int(port) < 0 or int(port) > 65535:
-        return ("<h2>Set port from <font color='brown'>0</font> to "
-                "<font color='brown'>65535</font></h2>")
+        return message
     processes = get_pids(int(port))[1]
     if not processes:
         return ("<h2><font color='green'>No processes found on this port: "
@@ -505,22 +527,34 @@ def dmesg_wlan() -> str:
     return get_dmesg_wlan()
 
 
-@app.route("/single_brute_ap/<essid>")
+@app.route("/single_brute_ap/<essid>", methods=['GET', 'POST'])
 def single_brute_ap(essid: str) -> str:
-    if essid == '<essid>':
-        message = ('<h2>Enter the name of the Access Point<p>Example Format: '
-                   '<font color="green">ASUS-007</font></p></h2>')
+    if request.method == "POST":
+        essid = f"{request.form['ap']}"
+    elif essid == '<essid>':
+        message = ('<html><h2>Enter the name of the Access Point<p>'
+                   'Example Format: <font color="green">ASUS-007</font></p>')
+        message += ('<div><form method="post"><br><label for="name-ap">AP: '
+                    '</label><input id="name-ap" name="ap" type="text"> '
+                    '<button type="submit">submit</button></br></form></div>'
+                    '</h2></html>')
         return message
     return set_single_brute_ap(essid, wpa_equals_wps=True)
 
 
-@app.route("/multi_brute_ap/<level>")
+@app.route("/multi_brute_ap/<level>", methods=['GET', 'POST'])
 def multi_brute_ap(level: str) -> str:
     pattern = r'\d\d-\d\d'
-    message = ('<h2>Signal level interval<p>Example Format: '
+    message = ('<html><h2>Signal level interval<p>Example Format: '
                '<font color="green">00-30</font></p><p>Example Format: '
                '<font color="green">55-57</font></p><p>Example: '
-               '<a href="/multi_brute_ap/30-33">multi_brute_ap/30-33</a></p></h2>')
+               '<a href="/multi_brute_ap/30-33">multi_brute_ap/30-33</a></p>')
+    message += ('<div><form method="post"><br><label for="name-level">Level: '
+                '</label><input id="name-level" name="level" type="text"> '
+                '<button type="submit">submit</button></br></form></div>'
+                '</h2></html>')
+    if request.method == "POST":
+        level = f"{request.form['level']}"
     result = match(pattern, level)
     if result and (int(level[:2]) < int(level[-2:])):
         return set_multi_brute_ap(level)
