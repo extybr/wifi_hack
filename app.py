@@ -10,12 +10,12 @@ mkdir()
 
 
 def msg_post(length: int, name: str) -> str:
-    msg = (f'<div><form method="post"><br><label for="name-{name}">'
-           f'{name.capitalize()}: </label>'
-           f'<input id="name-{name}" name="{name}" type="text" '
-           f'maxlength="{length}"> <button type="submit">submit</button>'
-           f'</br></form></div></h2></html>')
-    return msg
+    message = (f'<div><form method="post"><br><label for="name-{name}">'
+               f'{name.capitalize()}: </label>'
+               f'<input id="name-{name}" name="{name}" type="text" '
+               f'maxlength="{length}"> <button type="submit">submit</button>'
+               f'</br></form></div></h2></html>')
+    return message
 
 
 @app.errorhandler(404)
