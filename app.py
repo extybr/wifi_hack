@@ -397,6 +397,11 @@ def ip() -> str:
     return get_ip()
 
 
+@app.route("/iptables")
+def iptables() -> str:
+    return get_iptables()
+
+
 @app.route("/iw_dev_wlan_link")
 def iw_dev_wlan_link() -> str:
     return get_iw_dev_wlan_link()
@@ -482,9 +487,16 @@ def create_ap() -> str:
     return set_create_ap()
 
 
-@app.route("/http_server")
-def http_server() -> str:
-    return start_http_server()
+@app.route("/http_server/<port>", methods=['GET', 'POST'])
+def http_server(port: str) -> str:
+    message = ("<html><h2>Set port from <font color='brown'>0</font> to "
+               "<font color='brown'>65535</font>")
+    message += msg_post(5, 'port')
+    if request.method == 'POST':
+        port = f"{request.form['port']}"
+    if not str(port).isdigit() or int(port) < 0 or int(port) > 65535:
+        return message
+    return start_http_server(port)
 
 
 @app.route("/ps_uptime")

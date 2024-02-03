@@ -27,7 +27,7 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'set_airodump_channel_36_177', 'set_tcpdump_pnl', 'get_iw_scan',
            'set_scapy_beacon', 'set_scapy_deauthentication', 'set_scapy_scan',
            'set_single_brute_ap', 'set_multi_brute_ap', 'set_brute_width_ap',
-           'set_nmap_lan_scan']
+           'set_nmap_lan_scan', 'get_iptables']
 
 FINISH = "<h2><font color='red'>FINISH</font></h2>"
 NOT_FOUND = "<h2><font color='red'>NOT FOUND</font></h2>"
@@ -632,6 +632,12 @@ def get_ip() -> str:
     return get_html('blue', result)
 
 
+def get_iptables() -> str:
+    cmd = "iptables -L --line-numbers"
+    result = model(cmd=cmd, arg='')
+    return get_html('blue', result)
+
+
 def get_iw_dev_wlan_link() -> str:
     wlan = get_phy()
     result = '<b>***** iw dev wlan link *****</b>'
@@ -776,8 +782,8 @@ def set_create_ap() -> str:
     return FINISH
 
 
-def start_http_server() -> str:
-    cmd = "gnome-terminal --window -- bash -c 'python3 -m http.server 80'"
+def start_http_server(port) -> str:
+    cmd = f"gnome-terminal --window -- bash -c 'python3 -m http.server {port}'"
     result = model(cmd=cmd, arg='')
     return get_html('green', result)
 
