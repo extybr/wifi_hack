@@ -1,3 +1,5 @@
+# SYSTEM = 'arch'
+SYSTEM = 'deb'
 WLAN, MON = 'wlan1', 'mon0'
 AP, PASS = 'HOME', '12345678'
 AP_PASS = {'Router_1': '12345678', 'Router_2': '12345678'}
@@ -21,3 +23,4 @@ LAN_SCAN = 'functions/scapy-scan.py'
 BRUTE_SH = f'{TEMPFOLDER}/s0i37/./wpa_brute-width.sh'
 BRUTE_PY = 'functions/wpa_brute.py'
 WPATMP = f'{TEMPFOLDER}/wpatmp'
+TERMINATOR = "terminator -g $HOME/.config/terminator/config -e"

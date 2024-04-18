@@ -1,7 +1,11 @@
 from flask import Flask, render_template, send_from_directory, request
 from re import match
-from functions import Type, Path, TEMPFOLDER
-from functions.manager import *
+from functions import Type, Path, TEMPFOLDER, SYSTEM
+
+if SYSTEM == 'deb':
+    from functions.manager_deb import *
+elif SYSTEM == 'arch':
+    from functions.manager_arch import *
 
 root_path = Path().cwd()
 template_path = Path(root_path) / 'template'
@@ -43,7 +47,10 @@ def pages() -> str:
 @app.route('/index')
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if SYSTEM == 'deb':
+        return render_template('index_deb.html')
+    if SYSTEM == 'arch':
+        return render_template('index_arch.html')
 
 
 @app.route('/template/<path:path>')
@@ -376,6 +383,11 @@ def nm_wpa_supplicant_status() -> str:
              f'{result_wss}</font></p></h2>')
     return stat
 
+
+@app.route("/iwconfig-inxi")
+def iwconfig_inxi() -> str:
+    return get_iwconfig_inxi()
+    
 
 @app.route("/iwconfig-hciconfig")
 def iwconfig_hciconfig() -> str:
