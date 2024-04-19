@@ -342,7 +342,7 @@ def set_scapy_beacon() -> str:
 
 
 def set_mdk4_deauthentication() -> str:
-    cmd = f"xterm -e mdk3 {WLAN} d -c"
+    cmd = f"xterm -e mdk4 {WLAN} d -c 1,2,3,4,5,6,7,8,9,10,11,12,13"
     model(cmd=cmd, arg='')
     return FINISH
 
@@ -414,14 +414,14 @@ def set_pyrit_striplive() -> str:
 
 
 def set_airgeddon() -> str:
-    cmd = "{TERMINATOR} 'airgeddon ; zsh'"
+    cmd = f"{TERMINATOR} '{AIRGEDDON} ; zsh'"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
 def set_hcxdumptool() -> str:
     #set_del_mon_interface()
-    cmd = f"{TERMINATOR} '{PATH} -i {WLAN} -w {DUMP}'"
+    cmd = f"{TERMINATOR} '{PATH} -i {WLAN} -w {DUMP} ; zsh'"
     # cmd = f'xterm -e hcxdumptool -i {WLAN} -o {DUMP} --enable_status=2'
     # subprocess.call(cmd, shell=True)
     subprocess.run(cmd, shell=True)
