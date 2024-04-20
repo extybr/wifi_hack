@@ -154,9 +154,9 @@ def airbase_fake_ap() -> str:
     return set_airbase_fake_ap()
 
 
-@app.route('/mdk3_fake_ap')
-def mdk3_fake_ap() -> str:
-    return set_mdk3_fake_ap()
+@app.route('/mdk4_fake_ap')
+def mdk4_fake_ap() -> str:
+    return set_mdk4_fake_ap()
 
 
 @app.route('/scapy_beacon')

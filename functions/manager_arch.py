@@ -6,14 +6,14 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'get_iwconfig_inxi', 'change_power', 'get_airmon_check',
            'free_port', 'set_airmon_check_kill', 'set_airmon_mode_monitor',
            'set_airodump', 'set_hcxdumptool', 'set_mode_managed', 'get_pids',
-           'get_iw_list', 'get_iwlist_scan', 'get_iw_wlan_info', 'set_wifite',
+           'get_iw_list', 'get_iwlist_scan', 'get_iw_wlan_info',
            'set_wlan_mode_monitor', 'set_wlan_set_type_monitor', 'set_fake_ap',
            'set_add_mon_type_monitor', 'get_iw_dev_info', 'get_ip',
            'set_del_mon_interface', 'set_hcxpcapngtool', 'set_aireplay_inject',
            'set_wpa_supplicant_start_stop', 'set_tshark_wlan_beacon',
            'set_sniffer', 'get_wpa_supplicant_status', 'set_hashcat_mask',
            'get_mac_to_wpspin', 'get_name_to_mac', 'get_iwlist_wlan_scan_ssid',
-           'set_mdk3_fake_ap', 'set_airbase_fake_ap', 'get_route_netstat',
+           'set_mdk4_fake_ap', 'set_airbase_fake_ap', 'get_route_netstat',
            'set_mdk4_deauthentication', 'change_channel', 'set_hashcat_dict',
            'set_aireplay_deauthentication', 'set_pyrit_striplive', 'set_horst',
            'set_kismet', 'set_airoscapy', 'start_http_server', 'set_waidps',
@@ -21,7 +21,7 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'set_tshark', 'set_wireshark', 'set_airgeddon', 'set_wifiphisher',
            'get_iwlist_channel', 'get_iw_dev_wlan_link', 'connecting_aps_wifi',
            'set_scapy_lan_scan', 'set_fluxion', 'get_cat_proc_net_dev',
-           'set_wifijammer',  'get_iw_reg_get', 'set_add_wlanXmon_type_monitor',
+           'get_iw_reg_get', 'set_add_wlanXmon_type_monitor',
            'get_ls_sys_class_net', 'set_create_ap', 'get_system_connections',
            'set_airodump_manufacturer_uptime_wps', 'get_dmesg_wlan',
            'set_airodump_channel_36_177', 'set_tcpdump_pnl', 'get_iw_scan',
@@ -270,7 +270,7 @@ def set_del_mon_interface() -> str:
             cmd = f"iw dev {i} del"
             subprocess.call(cmd, shell=True)
     for i in phy:
-        if i not in ['wlan0', 'wlan1', 'wlan2', WLAN[:3]]:
+        if i not in ['wlan0', 'wlan1', 'wlan2'] and not WLAN[:3] in i:
             cmd = f"iw dev {i} del"
             subprocess.call(cmd, shell=True)
     return "<h2>virtual interface <font color='red'>delete</font></h2>"
@@ -321,16 +321,18 @@ def set_airodump_manufacturer_uptime_wps() -> str:
 
 
 def set_airbase_fake_ap() -> str:
-    set_add_mon_type_monitor()
-    cmd = f"xterm -e airbase-ng -a 44:E9:DD:27:D8:F6 -e FREE -c 10 -Z 4 {MON}"
+    set_mode_managed()
+    # set_add_mon_type_monitor()
+    cmd = f"xterm -e airbase-ng -a 44:E9:DD:27:D8:F6 -e FREE -c 10 {WLAN}"
+    # cmd = f"xterm -e airbase-ng -a 44:E9:DD:27:D8:F6 -e FREE -c 10 -Z 4 {WLAN}"
     result = model(cmd=cmd, arg='')
     return get_html('black', result)
 
 
-def set_mdk3_fake_ap() -> str:
+def set_mdk4_fake_ap() -> str:
     set_add_mon_type_monitor()
-    cmd = f"xterm -e mdk3 {MON} b -v {FAKE_APS} -g -m"
-    # cmd = f"xterm -e mdk3 {MON} b -n 'FREE WIFI' -g -t 00:1E:20:36:24:3C -m -c 11"
+    cmd = f"xterm -e mdk4 {MON} b -v {FAKE_APS} -m -t 0 -c 1"
+    # cmd = f"xterm -e mdk4 {MON} b -n 'FREE WIFI' -t 1 -m -c 11"
     model(cmd=cmd, arg='')
     return FINISH
 
@@ -366,12 +368,6 @@ def set_aireplay_inject() -> str:
     return FINISH
 
 
-def set_wifite() -> str:
-    cmd = "{TERMINATOR} 'wifite --reaver ; zsh'"
-    subprocess.run(cmd, shell=True)
-    return FINISH
-
-
 def set_wifiphisher() -> str:
     cmd = "{TERMINATOR} 'wifiphisher ; zsh'"
     subprocess.run(cmd, shell=True)
@@ -382,13 +378,6 @@ def set_waidps() -> str:
     #set_del_mon_interface()
     set_wlan_set_type_monitor()
     cmd = f"{TERMINATOR} 'python2 {WAIDPS} -i {WLAN} ; zsh'"
-    subprocess.run(cmd, shell=True)
-    return FINISH
-
-
-def set_wifijammer() -> str:
-    set_wlan_mode_monitor()
-    cmd = f"{TERMINATOR} 'python2 {WIFIJAMMER} ; zsh'"
     subprocess.run(cmd, shell=True)
     return FINISH
 
@@ -550,23 +539,21 @@ def set_scapy_scan() -> str:
     subprocess.run(cmd, shell=True)
     return FINISH
 
-
-def get_iface_up():
-    try:
-        result = subprocess.getoutput('ip -br a | grep UP')
-        if result:
-            rs = result.split('\n')
-            string_result = ' '.join(i.split()[2] for i in rs)
-            list_result = [i.split()[2] for i in rs]
-            return result, string_result, list_result
-    except subprocess.CalledProcessError:
-        return
+     
+def default_route():
+    route = subprocess.getoutput('ip route').split('\n')
+    result = []
+    for i in route:
+        if not i.startswith("default"):
+            result.append(i.split(' ')[0])
+    return result
 
 
 def set_scapy_lan_scan() -> str:
-    up_iface = get_iface_up()
+    up_iface = default_route()
     if up_iface:
-        cmd = f"python3 {LAN_SCAN} '{up_iface[1]}'"
+        iface = ' '.join(up_iface)
+        cmd = f"python3 {LAN_SCAN} '{iface}'"
         result = subprocess.getoutput(cmd)
         if result:
             return get_html('blue', result)
@@ -575,9 +562,13 @@ def set_scapy_lan_scan() -> str:
 
 def set_nmap_lan_scan() -> str:
     result = ''
-    up_iface = get_iface_up()
+    up_iface = default_route()
+    nmap_net = []
     if up_iface:
-        for net in up_iface[2]:
+        for net in up_iface:
+            if net.startswith('192.') and net.endswith('/24'):
+                nmap_net.append(net)
+        for net in set(nmap_net):
             result += f'<b>**** {net} ****</b>'
             cmd = f"nmap -n {net}"
             result += '<p>' + subprocess.getoutput(cmd) + '</p>'
@@ -664,7 +655,7 @@ def get_iw_reg_get() -> str:
 
 def get_iwconfig_inxi() -> str:
     result = ''
-    cmd = ["iwconfig", "inxi -E", "inxi -i"]
+    cmd = ["iwconfig", "inxi -E", "inxi -i", "lshw -C network"]
     for i in cmd:
         result += f'<b>***** {i} *****</b><p>' + model(cmd=i, arg='') + '</p>'
     return get_html('blue', result)
@@ -741,8 +732,12 @@ def get_cat_proc_net_dev() -> str:
 
 
 def get_ls_sys_class_net() -> str:
-    cmd = "ls -l /sys/class/net"
-    result = model(cmd=cmd, arg='')
+    result = ''
+    command = ("ls -l /sys/class/net",
+    ('bash -c \'for i in $(ls /sys/class/net); do echo \"interface: $i\t\tMAC: '
+    '$(cat /sys/class/net/$i/address)\"; done\''))
+    for i in command:
+        result += f'<b>***** {i} *****</b><p>' + model(cmd=i, arg='') + '</p>'
     return get_html('blue', result)
 
 
