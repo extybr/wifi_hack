@@ -541,6 +541,7 @@ def set_scapy_scan() -> str:
 
      
 def default_route():
+    set_mode_managed()
     route = subprocess.getoutput('ip route').split('\n')
     result = []
     for i in route:
@@ -813,7 +814,9 @@ def get_pids(port: int) -> (List[int], List[str]):
 def free_port(port: int) -> None:
     """ Terminates processes occupying the given port """
     pids: List[int] = get_pids(port)[0]
-    [kill(pid, signal.SIGINT) for pid in pids if pids]
+    if pids:
+        for pid in pids:
+            kill(pid, signal.SIGINT)
 
 
 def get_system_connections() -> str:
