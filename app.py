@@ -1,11 +1,19 @@
 from flask import Flask, render_template, send_from_directory, request
 from re import match
-from functions import Type, Path, TEMPFOLDER, SYSTEM
+from functions import Type, Path, TEMPFOLDER
 
-if SYSTEM == 'deb':
+SYSTEM = ''
+if Path('/etc/debian_version').exists():
+    SYSTEM = 'deb'
     from functions.manager_deb import *
-elif SYSTEM == 'arch':
+elif Path('/etc/arch-release').exists():
+    SYSTEM = 'arch'
     from functions.manager_arch import *
+else:
+    exit('not supported')
+
+TEMPLATE = {'deb': 'index_deb.html',
+            'arch': 'index_arch.html'}
 
 root_path = Path().cwd()
 template_path = Path(root_path) / 'template'
@@ -47,10 +55,7 @@ def pages() -> str:
 @app.route('/index')
 @app.route('/')
 def index():
-    if SYSTEM == 'deb':
-        return render_template('index_deb.html')
-    if SYSTEM == 'arch':
-        return render_template('index_arch.html')
+    return render_template(TEMPLATE[SYSTEM])
 
 
 @app.route('/template/<path:path>')
@@ -487,6 +492,11 @@ def ls_sys_class_net() -> str:
 @app.route("/nmcli")
 def nmcli() -> str:
     return get_networks()
+    
+
+@app.route("/wpa_cli")
+def wpa_cli() -> str:
+    return get_wpa_cli_scan()
 
 
 @app.route("/wifi-home-connect")

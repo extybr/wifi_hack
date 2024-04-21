@@ -1,5 +1,5 @@
 # wifi_hack
 
-### Write the system in the configuration file (deb/arch)
+### supported systems: deb/arch
 
 ![preview](template/img/interface.jpg)

@@ -21,7 +21,7 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'set_tshark', 'set_wireshark', 'set_airgeddon', 'set_wifiphisher',
            'get_iwlist_channel', 'get_iw_dev_wlan_link', 'connecting_aps_wifi',
            'set_scapy_lan_scan', 'set_fluxion', 'get_cat_proc_net_dev',
-           'get_iw_reg_get', 'set_add_wlanXmon_type_monitor',
+           'get_iw_reg_get', 'set_add_wlanXmon_type_monitor', 'get_wpa_cli_scan',
            'get_ls_sys_class_net', 'set_create_ap', 'get_system_connections',
            'set_airodump_manufacturer_uptime_wps', 'get_dmesg_wlan',
            'set_airodump_channel_36_177', 'set_tcpdump_pnl', 'get_iw_scan',
@@ -199,7 +199,9 @@ def set_airmon_check_kill() -> str:
 
 
 def set_airmon_mode_monitor() -> str:
-    cmd = f'airmon-ng start {WLAN}'
+    set_airmon_check_kill()
+    set_add_mon_type_monitor()
+    cmd = f'airmon-ng start {MON}'
     model(cmd=cmd, arg='')
     return FINISH
 
@@ -708,6 +710,13 @@ def get_iwlist_wlan_scan_mac() -> set:
     return output
 
 
+def get_wpa_cli_scan() -> set:
+    set_mode_managed()
+    cmd = 'wpa_cli scan &>/dev/null; wpa_cli scan_results'
+    output = subprocess.getoutput(cmd)
+    return get_html('blue', output)
+
+
 def get_iw_wlan_info() -> str:
     cmd = f"iw {WLAN} info"
     result = model(cmd=cmd, arg='')
@@ -767,7 +776,8 @@ def connecting_aps_wifi() -> str:
 
 
 def set_create_ap() -> str:
-    cmd = (f"{TERMINATOR} 'create_ap {WLAN} eth0 MyAP password'")
+    # cmd = (f"{TERMINATOR} 'create_ap {WLAN} eth0 MyAP password'")
+    cmd = (f"{TERMINATOR} 'tempfiles/linux-router/./lnxrouter --ap {WLAN} MyAccessPoint -p MyPassPhrase'")
     model(cmd=cmd, arg='')
     return FINISH
 

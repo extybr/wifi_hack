@@ -1,5 +1,3 @@
-# SYSTEM = 'arch'
-SYSTEM = 'deb'
 WLAN, MON = 'wlan1', 'mon0'
 AP, PASS = 'HOME', '12345678'
 AP_PASS = {'Router_1': '12345678', 'Router_2': '12345678'}
