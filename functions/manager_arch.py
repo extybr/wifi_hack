@@ -6,7 +6,7 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'get_iwconfig_inxi', 'change_power', 'get_airmon_check',
            'free_port', 'set_airmon_check_kill', 'set_airmon_mode_monitor',
            'set_airodump', 'set_hcxdumptool', 'set_mode_managed', 'get_pids',
-           'get_iw_list', 'get_iwlist_scan', 'get_iw_wlan_info',
+           'get_iw_list', 'get_iwlist_scan', 'get_iw_wlan_info', 'set_ap_up',
            'set_wlan_mode_monitor', 'set_wlan_set_type_monitor', 'set_fake_ap',
            'set_add_mon_type_monitor', 'get_iw_dev_info', 'get_ip',
            'set_del_mon_interface', 'set_hcxpcapngtool', 'set_aireplay_inject',
@@ -22,7 +22,7 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'get_iwlist_channel', 'get_iw_dev_wlan_link', 'connecting_aps_wifi',
            'set_scapy_lan_scan', 'set_fluxion', 'get_cat_proc_net_dev',
            'get_iw_reg_get', 'set_add_wlanXmon_type_monitor', 'get_wpa_cli_scan',
-           'get_ls_sys_class_net', 'set_create_ap', 'get_system_connections',
+           'get_ls_sys_class_net', 'set_ap_down', 'get_system_connections',
            'set_airodump_manufacturer_uptime_wps', 'get_dmesg_wlan',
            'set_airodump_channel_36_177', 'set_tcpdump_pnl', 'get_iw_scan',
            'set_scapy_beacon', 'set_scapy_deauthentication', 'set_scapy_scan',
@@ -775,11 +775,24 @@ def connecting_aps_wifi() -> str:
     return "<h2><font color='red'>NOT CONNECTING</font></h2>"
 
 
-def set_create_ap() -> str:
-    # cmd = (f"{TERMINATOR} 'create_ap {WLAN} eth0 MyAP password'")
-    cmd = (f"{TERMINATOR} 'tempfiles/linux-router/./lnxrouter --ap {WLAN} MyAccessPoint -p MyPassPhrase'")
-    model(cmd=cmd, arg='')
-    return FINISH
+def set_ap_up(ap, passwd) -> str:
+    result = ""
+    #'cat /proc/sys/net/ipv4/ip_forward'
+    # iptables = ("sysctl -w net.ipv4.ip_forward=1", 
+    #            "iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -j MASQUERADE")
+    # cmd = f'nmcli dev wifi hotspot ifname {WLAN} band bg password pass ssid myap con-name myap'
+    cmd = (f"nmcli dev wifi hotspot ifname {WLAN} password {passwd} ssid {ap}", 
+           f"nmcli dev wifi show-password")
+    for i in cmd:
+        result += model(cmd=i, arg='')
+    return get_html('green', result)
+    
+    
+def set_ap_down() -> str:
+    # cmd = 'nmcli con down myap'
+    cmd = f"nmcli dev | grep {WLAN} | tr -s ' ' | cut -d ' ' -f4 | xargs nmcli con down"
+    result = subprocess.getoutput(cmd)
+    return get_html('green', result)
 
 
 def start_http_server(port) -> str:

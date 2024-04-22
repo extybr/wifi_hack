@@ -512,7 +512,28 @@ def connect_ap_to_ap_wifi() -> str:
 @app.route("/create-ap")
 def create_ap() -> str:
     return set_create_ap()
+    
 
+@app.route("/ap-up/<ap>/<password>", methods=['GET', 'POST'])
+def ap_up(ap: str, password: str) -> str:
+    message = ("<html><h2>Enter the access point name <font color='brown'>AP</font> and "
+               "<font color='brown'>password</font>")
+    message += '<html><h2>' + msg_post(30, 'ap')[:-67] + msg_post(30, 'password')[29:]
+    if request.method == 'POST':
+        ap = f"{request.form['ap']}"
+        password = f"{request.form['password']}"
+        print(ap, password)
+    elif ap == '<ap>' and password == '<password>':
+        return message
+    if not ap or len(password) < 8:
+        return message
+    return set_ap_up(ap, password)
+
+
+@app.route("/ap-down")
+def ap_down() -> str:
+    return set_ap_down()
+    
 
 @app.route("/http_server/<port>", methods=['GET', 'POST'])
 def http_server(port: str) -> str:
