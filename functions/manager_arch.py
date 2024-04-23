@@ -27,7 +27,7 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'set_airodump_channel_36_177', 'set_tcpdump_pnl', 'get_iw_scan',
            'set_scapy_beacon', 'set_scapy_deauthentication', 'set_scapy_scan',
            'set_single_brute_ap', 'set_multi_brute_ap', 'set_brute_width_ap',
-           'set_nmap_lan_scan', 'get_iptables']
+           'set_nmap_lan_scan', 'get_iptables', 'checking_installed_programs']
 
 FINISH = "<h2><font color='red'>FINISH</font></h2>"
 NOT_FOUND = "<h2><font color='red'>NOT FOUND</font></h2>"
@@ -917,3 +917,29 @@ def set_brute_width_ap() -> str:
     cmd = f"{TERMINATOR} '{BRUTE_SH} {WLAN}'"
     subprocess.run(cmd, shell=True)
     return FINISH
+    
+    
+def checking_installed_programs():
+    green = '\33[42m'
+    red = '\33[41m'
+    normal = '\33[0m'
+    utils = ('wireless_tools', 'net-tools', 'NetworkManager', 'nmcli',  
+             'curl', 'iw', 'ss', 'inxi')
+    programs = ('tshark', 'wireshark', 'kismet', 'horst', 'pyrit', 'scapy', 
+                'airmon-ng', 'mdk4', 'airgeddon', 'fluxion', 'wifiphisher',
+                'waidps', 'hashcat', 'hcxdumptool', 'hcxpcapngtool')
+    for i in utils:
+        command = subprocess.getoutput(f"command -v {i}")
+        installed = subprocess.getoutput(f"pacman -Qqe | grep {i}")
+        if command or installed:
+            print(f'[*] {i} ..... {green}[+]{normal}')
+        else:
+            print(f'[*] {i} ..... {red}[-]{normal}')
+    for i in programs:
+        command = subprocess.getoutput(f"command -v {i}")
+        installed = subprocess.getoutput(f"pacman -Qqe | grep {i}")
+        if command or installed or Path(f'tempfiles/{i}').exists():
+            print(f'[*] {i} ..... {green}[+]{normal}')
+        else:
+            print(f'[*] {i} ..... {red}[-]{normal}')
+   

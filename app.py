@@ -9,6 +9,7 @@ if Path('/etc/debian_version').exists():
 elif Path('/etc/arch-release').exists():
     SYSTEM = 'arch'
     from functions.manager_arch import *
+    checking_installed_programs()
 else:
     exit('not supported')
 
