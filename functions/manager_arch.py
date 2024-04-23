@@ -676,7 +676,7 @@ def get_route_netstat() -> str:
 def get_iwlist_scan() -> str:
     set_mode_managed()
     cmd = "iwlist scan"
-    result = model(cmd=cmd, arg='')
+    result = subprocess.getoutput(cmd)
     return get_html('blue', result)
 
 
@@ -859,15 +859,16 @@ def get_dmesg_wlan() -> str:
 
 
 def get_list_essid(level: str) -> list:
-    sl = f'[{level[0]}-{level[3]}][{level[1]}-{level[4]}]'
-    if int(level[1]) > int(level[4]):
-        sl = f'[{level[0]}-{level[3]}][{level[4]}-{level[1]}]'
-    cmd = f"iw dev {WLAN} scan | grep -E '^BSS|signal: -{sl}... dBm|SSID:'"
+    cmd = f"iw dev {WLAN} scan | grep -E '^BSS|signal:|SSID:'"
     output = subprocess.getoutput(cmd).split('BSS ')[1:]
     aps = []
     for item in output:
-        ssid = item[61:].strip()
-        if 'signal:' in item and len(ssid) > 0:
+        if 'SSID' not in item:
+            output.remove(item)
+        ssid = item[62:].strip()
+        signal = item[46:48]
+        sig = level[:2] < signal < level[3:]
+        if ssid and sig:
             aps.append(ssid)
     return aps
 
@@ -895,7 +896,7 @@ def set_single_brute_ap(ssid: str, wpa_equals_wps=False) -> str:
         if mac:
             wpspin = get_mac_to_wpspin(mac.replace(':', '').replace('-', ''))
     cmd = (f"{TERMINATOR} 'python3 {BRUTE_PY} {WLAN}"
-           f" \"{ssid}\" {DEFAULT_PASS} {WPATMP} {wpspin}'")
+           f" \"{ssid}\" {DEFAULT_PASS} {WPATMP} {wpspin}' 2>/dev/null")
     subprocess.run(cmd, shell=True)
     return FINISH
 
@@ -924,7 +925,7 @@ def checking_installed_programs():
     red = '\33[41m'
     normal = '\33[0m'
     utils = ('wireless_tools', 'net-tools', 'NetworkManager', 'nmcli',  
-             'curl', 'iw', 'ss', 'inxi')
+             'curl', 'iw', 'ss', 'inxi', 'terminator')
     programs = ('tshark', 'wireshark', 'kismet', 'horst', 'pyrit', 'scapy', 
                 'airmon-ng', 'mdk4', 'airgeddon', 'fluxion', 'wifiphisher',
                 'waidps', 'hashcat', 'hcxdumptool', 'hcxpcapngtool')

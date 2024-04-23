@@ -515,17 +515,15 @@ def create_ap() -> str:
     return set_create_ap()
     
 
-@app.route("/ap-up/<ap>/<password>", methods=['GET', 'POST'])
-def ap_up(ap: str, password: str) -> str:
+@app.route("/ap-up", methods=['GET', 'POST'])
+def ap_up() -> str:
+    ap, password = '', ''
     message = ("<html><h2>Enter the access point name <font color='brown'>AP</font> and "
                "<font color='brown'>password</font>")
     message += '<html><h2>' + msg_post(30, 'ap')[:-67] + msg_post(30, 'password')[29:]
     if request.method == 'POST':
         ap = f"{request.form['ap']}"
         password = f"{request.form['password']}"
-        print(ap, password)
-    elif ap == '<ap>' and password == '<password>':
-        return message
     if not ap or len(password) < 8:
         return message
     return set_ap_up(ap, password)
@@ -590,12 +588,14 @@ def dmesg_wlan() -> str:
 
 @app.route("/single_brute_ap/<essid>", methods=['GET', 'POST'])
 def single_brute_ap(essid: str) -> str:
+    message = ('<html><h2>Enter the name of the Access Point<p>'
+                   'Example Format: <font color="green">ASUS-007</font></p>')
+    message += msg_post(50, 'ap')
     if request.method == "POST":
         essid = f"{request.form['ap']}"
-    elif essid == '<essid>':
-        message = ('<html><h2>Enter the name of the Access Point<p>'
-                   'Example Format: <font color="green">ASUS-007</font></p>')
-        message += msg_post(50, 'ap')
+    elif request.path == '/single_brute_ap/<essid>':  
+        return message
+    if not essid:
         return message
     return set_single_brute_ap(essid, wpa_equals_wps=True)
 
