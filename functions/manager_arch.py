@@ -631,7 +631,7 @@ def get_iw_dev_wlan_link() -> str:
     for i in wlan:
         cmd = f"iw dev {i} link"
         result += '<p>' + model(cmd=cmd, arg='') + '</p>'
-    cmd = ["networkctl status", "nmcli dev status"]
+    cmd = ["networkctl status", "nmcli dev status", "nmcli con show"]
     for i in cmd:
         result += f'<b>***** {i} *****</b><p>' + model(cmd=i, arg='') + '</p>'
     return get_html('blue', result)
@@ -802,12 +802,13 @@ def set_ap_down() -> str:
     for i in output:
         if len(i) == 36:
             result = subprocess.getoutput(f'nmcli con down {i} 2>/dev/null')
+            subprocess.run(f'nmcli con del {i}', shell=True)
             return get_html('green', result)
     return NOT_FOUND
 
 
 def set_wihotspot_ap_up():
-    cmd = 'wihotspot'
+    cmd = 'wihotspot 2>/dev/null'
     subprocess.run(cmd, shell=True)
     return FINISH
 
