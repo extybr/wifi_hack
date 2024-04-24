@@ -3,12 +3,12 @@ from . import *
 __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol',
            'network_manager_start_stop', 'get_network_manager_status', 'get_ls',
            'get_ps_uptime', 'connecting_wifi', 'get_networks', 'get_ifconfig',
-           'get_iwconfig_inxi', 'change_power', 'get_airmon_check',
+           'get_iwconfig_inxi', 'change_power', 'get_airmon_check', 'get_ip',
            'free_port', 'set_airmon_check_kill', 'set_airmon_mode_monitor',
            'set_airodump', 'set_hcxdumptool', 'set_mode_managed', 'get_pids',
            'get_iw_list', 'get_iwlist_scan', 'get_iw_wlan_info', 'set_ap_up',
            'set_wlan_mode_monitor', 'set_wlan_set_type_monitor', 'set_fake_ap',
-           'set_add_mon_type_monitor', 'get_iw_dev_info', 'get_ip',
+           'set_add_mon_type_monitor', 'get_iw_dev_info', 'get_networks_line', 
            'set_del_mon_interface', 'set_hcxpcapngtool', 'set_aireplay_inject',
            'set_wpa_supplicant_start_stop', 'set_tshark_wlan_beacon',
            'set_sniffer', 'get_wpa_supplicant_status', 'set_hashcat_mask',
@@ -23,11 +23,12 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'set_scapy_lan_scan', 'set_fluxion', 'get_cat_proc_net_dev',
            'get_iw_reg_get', 'set_add_wlanXmon_type_monitor', 'get_wpa_cli_scan',
            'get_ls_sys_class_net', 'set_ap_down', 'get_system_connections',
-           'set_airodump_manufacturer_uptime_wps', 'get_dmesg_wlan',
+           'set_airodump_manufacturer_uptime_wps', 'get_dmesg_wlan', 
            'set_airodump_channel_36_177', 'set_tcpdump_pnl', 'get_iw_scan',
            'set_scapy_beacon', 'set_scapy_deauthentication', 'set_scapy_scan',
            'set_single_brute_ap', 'set_multi_brute_ap', 'set_brute_width_ap',
-           'set_nmap_lan_scan', 'get_iptables', 'checking_installed_programs']
+           'set_nmap_lan_scan', 'get_iptables', 'checking_installed_programs',
+           'set_wihotspot_ap_up']
 
 FINISH = "<h2><font color='red'>FINISH</font></h2>"
 NOT_FOUND = "<h2><font color='red'>NOT FOUND</font></h2>"
@@ -756,6 +757,12 @@ def get_networks() -> str:
     cmd = "nmcli dev wifi"
     result = model(cmd=cmd, arg='con')
     return get_html('purple', result)
+    
+def get_networks_line() -> str:
+    set_mode_managed()
+    cmd = "nmcli --mode multiline dev wifi"
+    result = model(cmd=cmd, arg='con')
+    return get_html('purple', result)
 
 
 def connecting_wifi() -> str:
@@ -790,9 +797,19 @@ def set_ap_up(ap, passwd) -> str:
     
 def set_ap_down() -> str:
     # cmd = 'nmcli con down myap'
-    cmd = f"nmcli dev | grep {WLAN} | tr -s ' ' | cut -d ' ' -f4 | xargs nmcli con down"
-    result = subprocess.getoutput(cmd)
-    return get_html('green', result)
+    # cmd = f"nmcli dev | grep {WLAN} | tr -s ' ' | cut -d ' ' -f4-99 | xargs nmcli con down"
+    output = subprocess.getoutput(f"nmcli con show | grep {WLAN}").split()
+    for i in output:
+        if len(i) == 36:
+            result = subprocess.getoutput(f'nmcli con down {i} 2>/dev/null')
+            return get_html('green', result)
+    return NOT_FOUND
+
+
+def set_wihotspot_ap_up():
+    cmd = 'wihotspot'
+    subprocess.run(cmd, shell=True)
+    return FINISH
 
 
 def start_http_server(port) -> str:
@@ -928,7 +945,7 @@ def checking_installed_programs():
              'curl', 'iw', 'ss', 'inxi', 'terminator')
     programs = ('tshark', 'wireshark', 'kismet', 'horst', 'pyrit', 'scapy', 
                 'airmon-ng', 'mdk4', 'airgeddon', 'fluxion', 'wifiphisher',
-                'waidps', 'hashcat', 'hcxdumptool', 'hcxpcapngtool')
+                'waidps', 'hashcat', 'hcxdumptool', 'hcxpcapngtool', 'wihotspot')
     for i in utils:
         command = subprocess.getoutput(f"command -v {i}")
         installed = subprocess.getoutput(f"pacman -Qqe | grep {i}")

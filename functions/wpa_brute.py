@@ -30,9 +30,9 @@ def set_new_mac() -> str:
 
 def change_mac() -> None:
     mac = set_new_mac()
-    cmd = [f"ifconfig {WLAN} down",
-           f"ifconfig {WLAN} hw ether {mac}",
-           f"ifconfig {WLAN} up"]
+    cmd = [f"ip link set dev {WLAN} down",
+           f"ip link set dev {WLAN} address {mac}",
+           f"ip link set dev {WLAN} up"]
     [call(i, shell=True) for i in cmd]
 
 

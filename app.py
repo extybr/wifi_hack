@@ -494,6 +494,11 @@ def ls_sys_class_net() -> str:
 def nmcli() -> str:
     return get_networks()
     
+    
+@app.route("/nmcli-line")
+def nmcli_line() -> str:
+    return get_networks_line()
+    
 
 @app.route("/wpa_cli")
 def wpa_cli() -> str:
@@ -532,6 +537,11 @@ def ap_up() -> str:
 @app.route("/ap-down")
 def ap_down() -> str:
     return set_ap_down()
+
+
+@app.route("/wihotspot-ap-up")
+def wihotspot_ap_up() -> str:
+    return set_wihotspot_ap_up()
     
 
 @app.route("/http_server/<port>", methods=['GET', 'POST'])

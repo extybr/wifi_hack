@@ -19,6 +19,7 @@
 > wireshark, tshark: <a href='https://github.com/wireshark/wireshark'>https://github.com/wireshark/wireshark</a>
 > create ap: <a href='https://github.com/oblique/create_ap'>https://github.com/oblique/create_ap</a>
 > wifi script (wpa_brute-width.sh): <a href='https://github.com/s0i37/wifi'>https://github.com/s0i37/wifi</a>
+> linux-wifi-hotspot: <a href='https://github.com/lakinduakash/linux-wifi-hotspot'>https://github.com/lakinduakash/linux-wifi-hotspot</a>
 
 ################################################################
 Getting Started and Troubleshooting:
@@ -44,6 +45,7 @@ fix scapy: instal scapy3.2.2 version
 # git clone https://github.com/FluxionNetwork/fluxion tempfiles/
 # git clone https://github.com/oblique/create_ap (cd create_ap, make install)
 # git clone https://github.com/s0i37/wifi
+# git clone https://github.com/lakinduakash/linux-wifi-hotspot
 
 ################################################################
 program start example:
