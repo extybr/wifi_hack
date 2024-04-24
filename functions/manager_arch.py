@@ -7,16 +7,16 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'free_port', 'set_airmon_check_kill', 'set_airmon_mode_monitor',
            'set_airodump', 'set_hcxdumptool', 'set_mode_managed', 'get_pids',
            'get_iw_list', 'get_iwlist_scan', 'get_iw_wlan_info', 'set_ap_up',
-           'set_wlan_mode_monitor', 'set_wlan_set_type_monitor', 'set_fake_ap',
+           'set_wlan_mode_monitor', 'set_wlan_set_type_monitor', 
            'set_add_mon_type_monitor', 'get_iw_dev_info', 'get_networks_line', 
            'set_del_mon_interface', 'set_hcxpcapngtool', 'set_aireplay_inject',
            'set_wpa_supplicant_start_stop', 'set_tshark_wlan_beacon',
-           'set_sniffer', 'get_wpa_supplicant_status', 'set_hashcat_mask',
+           'get_wpa_supplicant_status', 'set_wihotspot_ap_up', 'get_iptables', 
            'get_mac_to_wpspin', 'get_name_to_mac', 'get_iwlist_wlan_scan_ssid',
            'set_mdk4_fake_ap', 'set_airbase_fake_ap', 'get_route_netstat',
            'set_mdk4_deauthentication', 'change_channel', 'set_hashcat_dict',
-           'set_aireplay_deauthentication', 'set_pyrit_striplive', 'set_horst',
-           'set_kismet', 'set_airoscapy', 'start_http_server', 'set_waidps',
+           'set_aireplay_deauthentication', 'set_horst', 'set_nmap_lan_scan', 
+           'set_kismet', 'start_http_server', 'set_waidps', 'set_hashcat_mask', 
            'set_del_tempfiles', 'get_rfkill_list', 'get_lspci_lsusb', 'mkdir',
            'set_tshark', 'set_wireshark', 'set_airgeddon', 'set_wifiphisher',
            'get_iwlist_channel', 'get_iw_dev_wlan_link', 'connecting_aps_wifi',
@@ -27,8 +27,7 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'set_airodump_channel_36_177', 'set_tcpdump_pnl', 'get_iw_scan',
            'set_scapy_beacon', 'set_scapy_deauthentication', 'set_scapy_scan',
            'set_single_brute_ap', 'set_multi_brute_ap', 'set_brute_width_ap',
-           'set_nmap_lan_scan', 'get_iptables', 'checking_installed_programs',
-           'set_wihotspot_ap_up']
+           'checking_installed_programs']
 
 FINISH = "<h2><font color='red'>FINISH</font></h2>"
 NOT_FOUND = "<h2><font color='red'>NOT FOUND</font></h2>"
@@ -385,22 +384,8 @@ def set_waidps() -> str:
     return FINISH
 
 
-def set_fake_ap() -> str:
-    cmd = f"{TERMINATOR} 'python2 {FAKEAP} -c 1 -e 'FREE*WIFI' ; zsh'"
-    subprocess.run(cmd, shell=True)
-    return FINISH
-
-
 def set_fluxion() -> str:
     cmd = f"{TERMINATOR} 'cd {FLUXION} && ./fluxion.sh ; zsh'"
-    subprocess.run(cmd, shell=True)
-    return FINISH
-
-
-def set_pyrit_striplive() -> str:
-    set_mode_managed()
-    set_wlan_mode_monitor()
-    cmd = f"{TERMINATOR} 'pyrit -r {WLAN} -o {DUMP} stripLive ; zsh'"
     subprocess.run(cmd, shell=True)
     return FINISH
 
@@ -499,20 +484,6 @@ def set_wireshark() -> str:
         subprocess.run(cmd, shell=True)
         return FINISH
     return NOT_FOUND
-
-
-def set_sniffer() -> str:
-    set_wlan_mode_monitor()
-    cmd = (f"{TERMINATOR} 'python2 functions/sniffer.py -i {WLAN}'")
-    subprocess.run(cmd, shell=True)
-    return FINISH
-
-
-def set_airoscapy() -> str:
-    set_wlan_mode_monitor()
-    cmd = (f"{TERMINATOR} 'python2 functions/airoscapy.py {WLAN}'")
-    subprocess.run(cmd, shell=True)
-    return FINISH
 
 
 def set_tshark_wlan_beacon() -> str:
@@ -944,9 +915,9 @@ def checking_installed_programs():
     normal = '\33[0m'
     utils = ('wireless_tools', 'net-tools', 'NetworkManager', 'nmcli',  
              'curl', 'iw', 'ss', 'inxi', 'terminator')
-    programs = ('tshark', 'wireshark', 'kismet', 'horst', 'pyrit', 'scapy', 
+    programs = ('tshark', 'wireshark', 'kismet', 'horst', 'wihotspot', 
                 'airmon-ng', 'mdk4', 'airgeddon', 'fluxion', 'wifiphisher',
-                'waidps', 'hashcat', 'hcxdumptool', 'hcxpcapngtool', 'wihotspot')
+                'waidps', 'hashcat', 'hcxdumptool', 'hcxpcapngtool', 'scapy')
     for i in utils:
         command = subprocess.getoutput(f"command -v {i}")
         installed = subprocess.getoutput(f"pacman -Qqe | grep {i}")
