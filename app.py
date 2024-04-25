@@ -408,7 +408,17 @@ def iwconfig_hciconfig() -> str:
 @app.route("/route-netstat")
 def route_netstat() -> str:
     return get_route_netstat()
+    
 
+@app.route("/netstat-ss")
+def netstat_ss() -> str:
+    return get_netstat_ss()
+
+
+@app.route("/lshw")
+def lshw() -> str:
+    return get_lshw()
+    
 
 @app.route("/ifconfig")
 def ifconfig() -> str:

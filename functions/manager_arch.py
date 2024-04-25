@@ -6,8 +6,8 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'get_iwconfig_inxi', 'change_power', 'get_airmon_check', 'get_ip',
            'free_port', 'set_airmon_check_kill', 'set_airodump', 'set_ap_up',
            'set_hcxdumptool', 'set_mode_managed', 'get_pids', 'get_iw_list', 
-           'get_iwlist_scan', 'get_iw_wlan_info', 'set_wlan_mode_monitor', 
-           'set_wlan_set_type_monitor', 'set_add_mon_type_monitor', 
+           'get_iwlist_scan', 'get_iw_wlan_info', 'get_netstat_ss', 
+           'set_wlan_set_type_monitor', 'set_add_mon_type_monitor', 'get_lshw', 
            'get_iw_dev_info', 'get_networks_line', 'set_del_mon_interface', 
            'set_hcxpcapngtool', 'set_aireplay_inject', 'set_tshark_wlan_beacon', 
            'set_wpa_supplicant_start_stop', 'get_wpa_supplicant_status', 
@@ -196,14 +196,6 @@ def set_airmon_check_kill() -> str:
     cmd = 'airmon-ng check kill'
     result = model(cmd=cmd, arg='')
     return get_html('black', result)
-
-
-def set_wlan_mode_monitor() -> str:
-    cmd = [f"ip link set {WLAN} down",
-           f"iwconfig {WLAN} mode monitor",
-           f"ip link set {WLAN} up"]
-    [subprocess.call(i, shell=True) for i in cmd]
-    return f"<h2>{WLAN} mode changed to <font color='red'>monitor</font></h2>"
 
 
 def set_wlan_set_type_monitor() -> str:
@@ -616,10 +608,26 @@ def get_iwconfig_inxi() -> str:
     return get_html('blue', result)
 
 
+def get_lshw() -> str:
+    result = ''
+    cmd = ["lshw -C network"]
+    for i in cmd:
+        result += f'<b>***** {i} *****</b><p>' + model(cmd=i, arg='') + '</p>'
+    return get_html('blue', result)
+    
+
 def get_route_netstat() -> str:
     cmd = "ip -br a | grep UP"
     result = f'<b>***** {cmd} *****</b><p>' + subprocess.getoutput(cmd) + '</p>'
-    command = [f"curl -s --max-time 5 http://ident.me {STDERR}", "ip route", "netstat -ntuop", "ss -4"]
+    command = [f"curl -s --max-time 5 http://ident.me {STDERR}", "ip route"]
+    for i in command:
+        result += f'<b>***** {i} *****</b><p>' + model(cmd=i, arg='') + '</p>'
+    return get_html('blue', result)
+
+
+def get_netstat_ss() -> str:
+    result = ''
+    command = [f"netstat -ntuop", "ss -4"]
     for i in command:
         result += f'<b>***** {i} *****</b><p>' + model(cmd=i, arg='') + '</p>'
     return get_html('blue', result)
@@ -889,7 +897,7 @@ def set_brute_width_ap() -> str:
     return FINISH
     
     
-def checking_installed_programs():
+def checking_installed_programs() -> None:
     green = '\33[42m'
     red = '\33[41m'
     normal = '\33[0m'
