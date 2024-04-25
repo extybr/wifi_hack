@@ -602,7 +602,7 @@ def get_iw_reg_get() -> str:
 
 def get_iwconfig_inxi() -> str:
     result = ''
-    cmd = ["iwconfig", "inxi -E", "inxi -i", "lshw -C network"]
+    cmd = ["iwconfig", "inxi -E", "inxi -i"]
     for i in cmd:
         result += f'<b>***** {i} *****</b><p>' + model(cmd=i, arg='') + '</p>'
     return get_html('blue', result)
