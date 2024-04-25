@@ -4,29 +4,29 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'network_manager_start_stop', 'get_network_manager_status', 'get_ls',
            'get_ps_uptime', 'connecting_wifi', 'get_networks', 'get_ifconfig',
            'get_iwconfig_inxi', 'change_power', 'get_airmon_check', 'get_ip',
-           'free_port', 'set_airmon_check_kill', 'set_airmon_mode_monitor',
-           'set_airodump', 'set_hcxdumptool', 'set_mode_managed', 'get_pids',
-           'get_iw_list', 'get_iwlist_scan', 'get_iw_wlan_info', 'set_ap_up',
-           'set_wlan_mode_monitor', 'set_wlan_set_type_monitor', 
-           'set_add_mon_type_monitor', 'get_iw_dev_info', 'get_networks_line', 
-           'set_del_mon_interface', 'set_hcxpcapngtool', 'set_aireplay_inject',
-           'set_wpa_supplicant_start_stop', 'set_tshark_wlan_beacon',
-           'get_wpa_supplicant_status', 'set_wihotspot_ap_up', 'get_iptables', 
-           'get_mac_to_wpspin', 'get_name_to_mac', 'get_iwlist_wlan_scan_ssid',
-           'set_mdk4_fake_ap', 'set_airbase_fake_ap', 'get_route_netstat',
-           'set_mdk4_deauthentication', 'change_channel', 'set_hashcat_dict',
-           'set_aireplay_deauthentication', 'set_horst', 'set_nmap_lan_scan', 
-           'set_kismet', 'start_http_server', 'set_waidps', 'set_hashcat_mask', 
-           'set_del_tempfiles', 'get_rfkill_list', 'get_lspci_lsusb', 'mkdir',
-           'set_tshark', 'set_wireshark', 'set_airgeddon', 'set_wifiphisher',
-           'get_iwlist_channel', 'get_iw_dev_wlan_link', 'connecting_aps_wifi',
-           'set_scapy_lan_scan', 'set_fluxion', 'get_cat_proc_net_dev',
-           'get_iw_reg_get', 'get_wpa_cli_scan', 'checking_installed_programs', 
-           'get_ls_sys_class_net', 'set_ap_down', 'get_system_connections',
-           'set_airodump_manufacturer_uptime_wps', 'get_dmesg_wlan', 
+           'free_port', 'set_airmon_check_kill', 'set_airodump', 'set_ap_up',
+           'set_hcxdumptool', 'set_mode_managed', 'get_pids', 'get_iw_list', 
+           'get_iwlist_scan', 'get_iw_wlan_info', 'set_wlan_mode_monitor', 
+           'set_wlan_set_type_monitor', 'set_add_mon_type_monitor', 
+           'get_iw_dev_info', 'get_networks_line', 'set_del_mon_interface', 
+           'set_hcxpcapngtool', 'set_aireplay_inject', 'set_tshark_wlan_beacon', 
+           'set_wpa_supplicant_start_stop', 'get_wpa_supplicant_status', 
+           'set_wihotspot_ap_up', 'get_iptables', 'get_mac_to_wpspin', 
+           'get_name_to_mac', 'get_iwlist_wlan_scan_ssid', 'set_mdk4_fake_ap', 
+           'set_airbase_fake_ap', 'get_route_netstat', 'set_hashcat_dict', 
+           'set_mdk4_deauthentication', 'change_channel', 'set_nmap_lan_scan', 
+           'set_aireplay_deauthentication', 'set_horst', 'set_hashcat_mask', 
+           'set_kismet', 'start_http_server', 'set_waidps', 'set_del_tempfiles', 
+           'get_rfkill_list', 'get_lspci_lsusb', 'mkdir', 'set_wifiphisher',
+           'set_tshark', 'set_wireshark', 'set_airgeddon', 'get_iwlist_channel', 
+           'get_iw_dev_wlan_link', 'connecting_aps_wifi', 'set_scapy_lan_scan', 
+           'set_fluxion', 'get_cat_proc_net_dev', 'checking_installed_programs', 
+           'get_iw_reg_get', 'get_wpa_cli_scan', 'get_ls_sys_class_net', 
+           'set_ap_down', 'get_system_connections', 'get_dmesg_wlan', 
+           'set_airodump_manufacturer_uptime_wps', 'set_brute_width_ap', 
            'set_airodump_channel_36_177', 'set_tcpdump_pnl', 'get_iw_scan',
            'set_scapy_beacon', 'set_scapy_deauthentication', 'set_scapy_scan',
-           'set_single_brute_ap', 'set_multi_brute_ap', 'set_brute_width_ap']
+           'set_single_brute_ap', 'set_multi_brute_ap']
 
 FINISH = "<h2><font color='red'>FINISH</font></h2>"
 NOT_FOUND = "<h2><font color='red'>NOT FOUND</font></h2>"
@@ -198,14 +198,6 @@ def set_airmon_check_kill() -> str:
     return get_html('black', result)
 
 
-def set_airmon_mode_monitor() -> str:
-    set_airmon_check_kill()
-    set_add_mon_type_monitor()
-    cmd = f'airmon-ng start {MON}'
-    model(cmd=cmd, arg='')
-    return FINISH
-
-
 def set_wlan_mode_monitor() -> str:
     cmd = [f"ip link set {WLAN} down",
            f"iwconfig {WLAN} mode monitor",
@@ -287,7 +279,7 @@ def set_airodump() -> str:
         set_mode_managed()
         set_wlan_set_type_monitor()
     cmd = f"{TERMINATOR} 'airodump-ng {WLAN} -w {DUMP[:-5]}' {STDERR}"
-    model(cmd=cmd, arg='')
+    subprocess.run(cmd, shell=True)
     return FINISH
 
 
@@ -307,7 +299,7 @@ def set_airodump_manufacturer_uptime_wps() -> str:
         set_mode_managed()
         set_wlan_set_type_monitor()
     cmd = f"{TERMINATOR} 'airodump-ng {WLAN} --manufacturer --uptime --wps' {STDERR}"
-    model(cmd=cmd, arg='')
+    subprocess.run(cmd, shell=True)
     return FINISH
 
 
