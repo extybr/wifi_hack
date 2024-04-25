@@ -6,7 +6,7 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'get_iwconfig_inxi', 'change_power', 'get_airmon_check', 'get_ip',
            'free_port', 'set_airmon_check_kill', 'set_airodump', 'set_ap_up',
            'set_hcxdumptool', 'set_mode_managed', 'get_pids', 'get_iw_list', 
-           'get_iwlist_scan', 'get_iw_wlan_info', 'get_netstat_ss', 
+           'get_iwlist_scan', 'get_netstat_ss', 'set_multi_brute_ap', 
            'set_wlan_set_type_monitor', 'set_add_mon_type_monitor', 'get_lshw', 
            'get_iw_dev_info', 'get_networks_line', 'set_del_mon_interface', 
            'set_hcxpcapngtool', 'set_aireplay_inject', 'set_tshark_wlan_beacon', 
@@ -26,7 +26,7 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'set_airodump_manufacturer_uptime_wps', 'set_brute_width_ap', 
            'set_airodump_channel_36_177', 'set_tcpdump_pnl', 'get_iw_scan',
            'set_scapy_beacon', 'set_scapy_deauthentication', 'set_scapy_scan',
-           'set_single_brute_ap', 'set_multi_brute_ap']
+           'set_single_brute_ap']
 
 FINISH = "<h2><font color='red'>FINISH</font></h2>"
 NOT_FOUND = "<h2><font color='red'>NOT FOUND</font></h2>"
@@ -675,12 +675,6 @@ def get_wpa_cli_scan() -> set:
     cmd = 'wpa_cli scan &>/dev/null; wpa_cli scan_results'
     output = subprocess.getoutput(cmd)
     return get_html('blue', output)
-
-
-def get_iw_wlan_info() -> str:
-    cmd = f"iw {WLAN} info"
-    result = model(cmd=cmd, arg='')
-    return get_html('blue', result)
 
 
 def get_iw_dev_info() -> str:
