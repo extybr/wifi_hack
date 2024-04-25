@@ -21,13 +21,12 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'set_tshark', 'set_wireshark', 'set_airgeddon', 'set_wifiphisher',
            'get_iwlist_channel', 'get_iw_dev_wlan_link', 'connecting_aps_wifi',
            'set_scapy_lan_scan', 'set_fluxion', 'get_cat_proc_net_dev',
-           'get_iw_reg_get', 'set_add_wlanXmon_type_monitor', 'get_wpa_cli_scan',
+           'get_iw_reg_get', 'get_wpa_cli_scan', 'checking_installed_programs', 
            'get_ls_sys_class_net', 'set_ap_down', 'get_system_connections',
            'set_airodump_manufacturer_uptime_wps', 'get_dmesg_wlan', 
            'set_airodump_channel_36_177', 'set_tcpdump_pnl', 'get_iw_scan',
            'set_scapy_beacon', 'set_scapy_deauthentication', 'set_scapy_scan',
-           'set_single_brute_ap', 'set_multi_brute_ap', 'set_brute_width_ap',
-           'checking_installed_programs']
+           'set_single_brute_ap', 'set_multi_brute_ap', 'set_brute_width_ap']
 
 FINISH = "<h2><font color='red'>FINISH</font></h2>"
 NOT_FOUND = "<h2><font color='red'>NOT FOUND</font></h2>"
@@ -228,12 +227,6 @@ def set_add_mon_type_monitor() -> str:
     return f"<h2>{WLAN} added mon mode <font color='red'>monitor</font></h2>"
 
 
-def set_add_wlanXmon_type_monitor() -> str:
-    cmd = f"iw {WLAN} interface add {WLAN}mon type monitor"
-    subprocess.call(cmd, shell=True)
-    return f"<h2>{WLAN} added {WLAN}mon mode <font color='red'>monitor</font></h2>"
-
-
 def get_phy() -> list:
     result = []
     cmd = 'iwconfig'
@@ -246,36 +239,31 @@ def get_phy() -> list:
 
 def set_mode_managed() -> str:
     phy = get_phy()
-    for i in ['wlan0mon', 'wlan1mon', 'wlan2mon', f'{WLAN}mon']:
-        if i in phy:
-            cmd = [f"ip link set {i} down",
-                   f"iw dev {i} set type managed",
-                   f"ip link set {i} up"]
-            [subprocess.call(k, shell=True) for k in cmd]
-        if phy.count(i[:-3]) < 2:
-            cmd = f"iw {i} interface add {i[:-3]} type managed"
-            subprocess.call(cmd, shell=True)
-    for i in ['wlan0', 'wlan1', 'wlan2', WLAN]:
-        if i in phy:
-            cmd = [f"ip link set {i} down",
-                   f"iw dev {i} set type managed",
-                   f"ip link set {i} up"]
-            [subprocess.call(k, shell=True) for k in cmd]
-    return "<h2>wlan mode changed to <font color='green'>managed</font></h2>"
+    iface = subprocess.getoutput('iw dev').split('Interface')[1:]
+    dev = ''
+    for i in phy:
+        for j in iface:
+            if i in j and 'type managed' not in j:
+                cmd = [f"ip link set {i} down",
+                       f"iw dev {i} set type managed",
+                       f"ip link set {i} up"]
+                [subprocess.call(k, shell=True) for k in cmd]
+                dev += i + ', '
+    return f"<h2>wlan mode changed to <font color='green'>managed</font> ({dev})</h2>"
 
 
 def set_del_mon_interface() -> str:
     set_mode_managed()
-    phy = get_phy()
-    for i in [MON, 'wlan0mon', 'wlan1mon', 'wlan2mon', f'{WLAN}mon']:
-        if i in phy:
-            cmd = f"iw dev {i} del"
-            subprocess.call(cmd, shell=True)
-    for i in phy:
-        if i not in ['wlan0', 'wlan1', 'wlan2'] and not WLAN[:3] in i:
-            cmd = f"iw dev {i} del"
-            subprocess.call(cmd, shell=True)
-    return "<h2>virtual interface <font color='red'>delete</font></h2>"
+    interface = subprocess.getoutput('iw dev | grep Interface').split('\n')
+    interface = [i.replace('Interface', '').strip()  for i in interface]
+    dev = subprocess.getoutput('nmcli dev status | grep wifi').split('\n')
+    dev = [i.split()[0] for i in dev]
+    del_iface = ''
+    for i in interface:
+        if i not in dev:
+            subprocess.call(f"iw dev {i} del", shell=True)
+            del_iface += i + ', '
+    return f"<h2>virtual interface <font color='red'>delete </font>{del_iface}</h2>"
 
 
 def set_del_tempfiles(path, ext) -> str:
