@@ -30,6 +30,7 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
 
 FINISH = "<h2><font color='red'>FINISH</font></h2>"
 NOT_FOUND = "<h2><font color='red'>NOT FOUND</font></h2>"
+STDERR = "2>/dev/null"
 
 
 def mkdir() -> None:
@@ -285,7 +286,7 @@ def set_airodump() -> str:
     if f'{WLAN}' and 'type monitor' not in getout:
         set_mode_managed()
         set_wlan_set_type_monitor()
-    cmd = (f"{TERMINATOR} 'airodump-ng {WLAN} -w {DUMP[:-5]}'")
+    cmd = f"{TERMINATOR} 'airodump-ng {WLAN} -w {DUMP[:-5]}' {STDERR}"
     model(cmd=cmd, arg='')
     return FINISH
 
@@ -295,7 +296,7 @@ def set_airodump_channel_36_177() -> str:
     if f'{WLAN}' and 'type monitor' not in getout:
         set_mode_managed()
         set_wlan_set_type_monitor()
-    cmd = (f"{TERMINATOR} 'airodump-ng --channel 36-177 {WLAN}'")
+    cmd = f"{TERMINATOR} 'airodump-ng --channel 36-177 {WLAN}' {STDERR}"
     model(cmd=cmd, arg='')
     return FINISH
 
@@ -305,7 +306,7 @@ def set_airodump_manufacturer_uptime_wps() -> str:
     if f'{WLAN}' and 'type monitor' not in getout:
         set_mode_managed()
         set_wlan_set_type_monitor()
-    cmd = (f"{TERMINATOR} 'airodump-ng {WLAN} --manufacturer --uptime --wps'")
+    cmd = f"{TERMINATOR} 'airodump-ng {WLAN} --manufacturer --uptime --wps' {STDERR}"
     model(cmd=cmd, arg='')
     return FINISH
 
@@ -353,13 +354,13 @@ def set_scapy_deauthentication() -> str:
 
 def set_aireplay_inject() -> str:
     set_wlan_mode_monitor()
-    cmd = f"{TERMINATOR} 'aireplay-ng -9 {WLAN}'"
+    cmd = f"{TERMINATOR} 'aireplay-ng -9 {WLAN}' {STDERR}"
     model(cmd=cmd, arg='')
     return FINISH
 
 
 def set_wifiphisher() -> str:
-    cmd = "{TERMINATOR} 'wifiphisher ; zsh'"
+    cmd = f"{TERMINATOR} 'wifiphisher ; zsh' {STDERR}"
     subprocess.run(cmd, shell=True)
     return FINISH
 
@@ -367,26 +368,25 @@ def set_wifiphisher() -> str:
 def set_waidps() -> str:
     #set_del_mon_interface()
     set_wlan_set_type_monitor()
-    cmd = f"{TERMINATOR} 'python2 {WAIDPS} -i {WLAN} ; zsh'"
+    cmd = f"{TERMINATOR} 'python2 {WAIDPS} -i {WLAN} ; zsh' {STDERR}"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
 def set_fluxion() -> str:
-    cmd = f"{TERMINATOR} 'cd {FLUXION} && ./fluxion.sh ; zsh'"
+    cmd = f"{TERMINATOR} 'cd {FLUXION} && ./fluxion.sh ; zsh' {STDERR}"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
 def set_airgeddon() -> str:
-    cmd = f"{TERMINATOR} '{AIRGEDDON} ; zsh'"
+    cmd = f"{TERMINATOR} '{AIRGEDDON} ; zsh' {STDERR}"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
 def set_hcxdumptool() -> str:
-    #set_del_mon_interface()
-    cmd = f"{TERMINATOR} '{PATH} -i {WLAN} -w {DUMP} ; zsh'"
+    cmd = f"{TERMINATOR} '{PATH} -i {WLAN} -w {DUMP} ; zsh' {STDERR}"
     # cmd = f'xterm -e hcxdumptool -i {WLAN} -o {DUMP} --enable_status=2'
     # subprocess.call(cmd, shell=True)
     subprocess.run(cmd, shell=True)
@@ -428,7 +428,7 @@ def get_hash() -> str:
 def set_hashcat_mask() -> str:
     _hash = get_hash()
     if _hash:
-        cmd = (f"{TERMINATOR} 'hashcat -m 22000 {_hash} -a 3 ?d?d?d?d?d?d?d?d ; zsh'")
+        cmd = (f"{TERMINATOR} 'hashcat -m 22000 {_hash} -a 3 ?d?d?d?d?d?d?d?d ; zsh' {STDERR}")
         subprocess.run(cmd, shell=True)
         return FINISH
     return NOT_FOUND
@@ -437,7 +437,7 @@ def set_hashcat_mask() -> str:
 def set_hashcat_dict() -> str:
     _hash = get_hash()
     if _hash:
-        cmd = (f"{TERMINATOR} 'hashcat -m 22000 {_hash} {DICTIONARY} ; zsh'")
+        cmd = (f"{TERMINATOR} 'hashcat -m 22000 {_hash} {DICTIONARY} ; zsh' {STDERR}")
         subprocess.run(cmd, shell=True)
         return FINISH
     return NOT_FOUND
@@ -451,7 +451,7 @@ def set_kismet() -> str:
 
 def set_horst() -> str:
     set_wlan_set_type_monitor()
-    cmd = f"{TERMINATOR} 'horst -i {WLAN}'"
+    cmd = f"{TERMINATOR} 'horst -i {WLAN}' {STDERR}"
     subprocess.run(cmd, shell=True)
     return FINISH
 
@@ -476,28 +476,28 @@ def set_wireshark() -> str:
 
 def set_tshark_wlan_beacon() -> str:
     set_wlan_mode_monitor()
-    cmd = (f"{TERMINATOR} 'tshark -i {WLAN} | grep Beacon --colour'")
+    cmd = (f"{TERMINATOR} 'tshark -i {WLAN} | grep Beacon --colour' {STDERR}")
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
 def set_tcpdump_pnl() -> str:
     set_wlan_mode_monitor()
-    cmd = f"{TERMINATOR} '{PNL} {WLAN}'"
+    cmd = f"{TERMINATOR} '{PNL} {WLAN}' {STDERR}"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
 def set_tcpdump_eapol() -> str:
     set_wlan_mode_monitor()
-    cmd = (f"{TERMINATOR} 'tcpdump -i {WLAN} | grep EAPOL --colour'")
+    cmd = (f"{TERMINATOR} 'tcpdump -i {WLAN} | grep EAPOL --colour' {STDERR}")
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
 def set_scapy_scan() -> str:
     set_wlan_mode_monitor()
-    cmd = f"{TERMINATOR} 'python3 {SCAN} {WLAN}'"
+    cmd = f"{TERMINATOR} 'python3 {SCAN} {WLAN}' {STDERR}"
     subprocess.run(cmd, shell=True)
     return FINISH
 
@@ -627,7 +627,7 @@ def get_iwconfig_inxi() -> str:
 def get_route_netstat() -> str:
     cmd = "ip -br a | grep UP"
     result = f'<b>***** {cmd} *****</b><p>' + subprocess.getoutput(cmd) + '</p>'
-    command = ["curl -s --max-time 5 http://ident.me 2>/dev/null", "ip route", "netstat -ntuop", "ss -4"]
+    command = [f"curl -s --max-time 5 http://ident.me {STDERR}", "ip route", "netstat -ntuop", "ss -4"]
     for i in command:
         result += f'<b>***** {i} *****</b><p>' + model(cmd=i, arg='') + '</p>'
     return get_html('blue', result)
@@ -760,14 +760,14 @@ def set_ap_down() -> str:
     output = subprocess.getoutput(f"nmcli con show | grep {WLAN}").split()
     for i in output:
         if len(i) == 36:
-            result = subprocess.getoutput(f'nmcli con down {i} 2>/dev/null')
+            result = subprocess.getoutput(f'nmcli con down {i} {STDERR}')
             subprocess.run(f'nmcli con del {i}', shell=True)
             return get_html('green', result)
     return NOT_FOUND
 
 
 def set_wihotspot_ap_up():
-    cmd = 'wihotspot 2>/dev/null'
+    cmd = f'wihotspot {STDERR}'
     subprocess.run(cmd, shell=True)
     return FINISH
 
@@ -873,7 +873,7 @@ def set_single_brute_ap(ssid: str, wpa_equals_wps=False) -> str:
         if mac:
             wpspin = get_mac_to_wpspin(mac.replace(':', '').replace('-', ''))
     cmd = (f"{TERMINATOR} 'python3 {BRUTE_PY} {WLAN}"
-           f" \"{ssid}\" {DEFAULT_PASS} {WPATMP} {wpspin}' 2>/dev/null")
+           f" \"{ssid}\" {DEFAULT_PASS} {WPATMP} {wpspin}' {SRDERR}")
     subprocess.run(cmd, shell=True)
     return FINISH
 
