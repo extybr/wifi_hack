@@ -337,7 +337,7 @@ def set_scapy_deauthentication() -> str:
 
 
 def set_aireplay_inject() -> str:
-    set_wlan_mode_monitor()
+    set_wlan_set_type_monitor()
     cmd = f"{TERMINATOR} 'aireplay-ng -9 {WLAN}' {STDERR}"
     model(cmd=cmd, arg='')
     return FINISH
@@ -459,28 +459,28 @@ def set_wireshark() -> str:
 
 
 def set_tshark_wlan_beacon() -> str:
-    set_wlan_mode_monitor()
+    set_wlan_set_type_monitor()
     cmd = (f"{TERMINATOR} 'tshark -i {WLAN} | grep Beacon --colour' {STDERR}")
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
 def set_tcpdump_pnl() -> str:
-    set_wlan_mode_monitor()
+    set_wlan_set_type_monitor()
     cmd = f"{TERMINATOR} '{PNL} {WLAN}' {STDERR}"
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
 def set_tcpdump_eapol() -> str:
-    set_wlan_mode_monitor()
+    set_wlan_set_type_monitor()
     cmd = (f"{TERMINATOR} 'tcpdump -i {WLAN} | grep EAPOL --colour' {STDERR}")
     subprocess.run(cmd, shell=True)
     return FINISH
 
 
 def set_scapy_scan() -> str:
-    set_wlan_mode_monitor()
+    set_wlan_set_type_monitor()
     cmd = f"{TERMINATOR} 'python3 {SCAN} {WLAN}' {STDERR}"
     subprocess.run(cmd, shell=True)
     return FINISH
