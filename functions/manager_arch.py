@@ -874,7 +874,7 @@ def set_single_brute_ap(ssid: str, wpa_equals_wps=False) -> str:
         if mac:
             wpspin = get_mac_to_wpspin(mac.replace(':', '').replace('-', ''))
     cmd = (f"{TERMINATOR} 'python3 {BRUTE_PY} {WLAN}"
-           f" \"{ssid}\" {DEFAULT_PASS} {WPATMP} {wpspin}' {SRDERR}")
+           f" \"{ssid}\" {DEFAULT_PASS} {WPATMP} {wpspin}' {STDERR}")
     subprocess.run(cmd, shell=True)
     return FINISH
 
