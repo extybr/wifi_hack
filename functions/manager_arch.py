@@ -906,7 +906,11 @@ def checking_installed_programs() -> None:
              'curl', 'iw', 'ss', 'inxi', 'terminator')
     programs = ('tshark', 'wireshark', 'kismet', 'horst', 'wihotspot', 
                 'airmon-ng', 'mdk4', 'airgeddon', 'fluxion', 'wifiphisher',
-                'waidps', 'hashcat', 'hcxdumptool', 'hcxpcapngtool', 'scapy')
+                'waidps', 'hashcat', 'hcxdumptool', 'hcxpcapngtool', 'scapy',
+                'hostapd', 'dnsmasq', 'reaver')
+    print(' Welcome '.center(30, '*'))
+    if subprocess.getoutput('whoami') != 'root':
+        exit('not root! bye ... bye ...')
     for i in utils:
         command = subprocess.getoutput(f"command -v {i}")
         installed = subprocess.getoutput(f"pacman -Qqe | grep {i}")
