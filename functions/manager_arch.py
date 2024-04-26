@@ -59,7 +59,7 @@ def set_new_mac() -> str:
 
 
 def change_mac(mac: str) -> str:
-    if 'monitor' in get_iw_wlan_info():
+    if 'monitor' in subprocess.getoutput(f"iw {WLAN} info"):
         msg = ("<h2><font color='red'><p>Fail !!!</p></font>"
                f"{WLAN} interface mode <font color='red'>monitor</font>.<p>"
                "Change mode to <font color='green'>managed</font></p></h2>")
@@ -252,17 +252,23 @@ def set_del_mon_interface() -> str:
 
 
 def set_del_tempfiles(path, ext) -> str:
+    del_files = '<ul>'
     for i in ext:
         files = Path(path).glob(f"*.{i}")
-        [Path(file).unlink() for file in files]
+        for file in files:
+            Path(file).unlink()
+            del_files += '<li>' + str(file) + '</li>'
     if Path(path / 'wpatmp').exists():
         for i in ext[-2:]:
             files = Path(path / 'wpatmp').glob(f"*.{i}")
-            [Path(file).unlink() for file in files]
+            for file in files:
+                Path(file).unlink()
+                del_files += '<li>' + str(file) + '</li>'
     kismet_files = Path().cwd().glob(f'*.{ext[0]}')
     for file in kismet_files:
         Path(file).unlink()
-    return "<h2><font color='red'>remove </font>tempfiles</h2>"
+        del_files += '<li>' + str(file) + '</li>'
+    return f"<h2><font color='red'>remove </font>tempfiles:{del_files}</ul></h2>"
 
 
 def set_airodump() -> str:
@@ -710,7 +716,8 @@ def get_networks() -> str:
     cmd = "nmcli dev wifi"
     result = model(cmd=cmd, arg='con')
     return get_html('purple', result)
-    
+
+ 
 def get_networks_line() -> str:
     set_mode_managed()
     cmd = "nmcli --mode multiline dev wifi"
