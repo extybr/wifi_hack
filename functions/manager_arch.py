@@ -26,7 +26,7 @@ __all__ = ['network_manager_read_change_conf', 'change_mac', 'set_tcpdump_eapol'
            'set_airodump_manufacturer_uptime_wps', 'set_brute_width_ap', 
            'set_airodump_channel_36_177', 'set_tcpdump_pnl', 'get_iw_scan',
            'set_scapy_beacon', 'set_scapy_deauthentication', 'set_scapy_scan',
-           'set_single_brute_ap']
+           'set_single_brute_ap', 'set_oneshot']
 
 FINISH = "<h2><font color='red'>FINISH</font></h2>"
 NOT_FOUND = "<h2><font color='red'>NOT FOUND</font></h2>"
@@ -359,6 +359,12 @@ def set_waidps() -> str:
     #set_del_mon_interface()
     set_wlan_set_type_monitor()
     cmd = f"{TERMINATOR} 'python2 {WAIDPS} -i {WLAN} ; zsh' {STDERR}"
+    subprocess.run(cmd, shell=True)
+    return FINISH
+
+
+def set_oneshot(addr: str) -> str:
+    cmd = f"{TERMINATOR} 'python3 {ONESHOT} -i {WLAN} -b {addr} -K; zsh' {STDERR}"
     subprocess.run(cmd, shell=True)
     return FINISH
 
@@ -906,8 +912,8 @@ def checking_installed_programs() -> None:
              'curl', 'iw', 'ss', 'inxi', 'terminator')
     programs = ('tshark', 'wireshark', 'kismet', 'horst', 'wihotspot', 
                 'airmon-ng', 'mdk4', 'airgeddon', 'fluxion', 'wifiphisher',
-                'waidps', 'hashcat', 'hcxdumptool', 'hcxpcapngtool', 'scapy',
-                'hostapd', 'dnsmasq', 'reaver')
+                'waidps', 'oneshot', 'hashcat', 'hcxdumptool', 'hcxpcapngtool', 
+                'scapy', 'hostapd', 'dnsmasq', 'pixiewps')
     print(' Welcome '.center(30, '*'))
     if subprocess.getoutput('whoami') != 'root':
         exit('not root! bye ... bye ...')

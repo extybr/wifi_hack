@@ -73,7 +73,8 @@ def md_help() -> str:
 
 @app.route('/mac_change')
 def mac_change() -> str:
-    return change_mac(mac='00:11:22:33:44:55')
+    # return change_mac(mac='00:11:22:33:44:55')
+    return change_mac(mac='b0:c0:90:9d:b0:b0')
 
 
 @app.route('/txpower_change')
@@ -208,6 +209,17 @@ def wifiphisher() -> str:
 @app.route('/waidps')
 def waidps() -> str:
     return set_waidps()
+
+
+@app.route('/oneshot/<mac>', methods=['GET', 'POST'])
+def oneshot(mac: str) -> str:
+    message = "<html><h2>Set mac address"
+    message += msg_post(17, 'mac')
+    if request.method == 'POST':
+        mac = f"{request.form['mac']}"
+    if mac == '<mac>' or len(mac) != 17:
+        return message
+    return set_oneshot(mac)
 
 
 @app.route('/wifijammer')

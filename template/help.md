@@ -7,6 +7,7 @@
 > wifite: <a href='https://github.com/derv82/wifite2'>https://github.com/derv82/wifite2</a>
 > wifiphisher: <a href='https://github.com/sophron/wifiphisher'>https://github.com/sophron/wifiphisher</a>
 > waidps: <a href='https://github.com/SYWorks/waidps'>https://github.com/SYWorks/waidps</a>
+> oneshot: <a href='https://github.com/kimocoder/OneShot'>https://github.com/kimocoder/OneShot</a>
 > wifijammer: <a href='https://github.com/DanMcInerney/wifijammer'>https://github.com/DanMcInerney/wifijammer</a>
 > fluxion: <a href='https://github.com/FluxionNetwork/fluxion'>https://github.com/FluxionNetwork/fluxion</a>
 > pyrit: <a href='https://github.com/JPaulMora/Pyrit'>https://github.com/JPaulMora/Pyrit</a>
@@ -39,6 +40,7 @@ fix scapy: instal scapy3.2.2 version
 # apt install kismet
 # apt install horst
 # apt install wireshark
+# apt install pixiewps
 # git clone https://github.com/ZerBea/hcxdumptool tempfiles/
 # git clone https://github.com/SYWorks/waidps tempfiles/
 # git clone https://github.com/DanMcInerney/wifijammer tempfiles/
@@ -46,6 +48,7 @@ fix scapy: instal scapy3.2.2 version
 # git clone https://github.com/oblique/create_ap (cd create_ap, make install)
 # git clone https://github.com/s0i37/wifi
 # git clone https://github.com/lakinduakash/linux-wifi-hotspot
+# git clone https://github.com/kimocoder/OneShot
 
 ################################################################
 program start example:
