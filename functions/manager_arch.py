@@ -908,22 +908,17 @@ def checking_installed_programs() -> None:
     green = '\33[42m'
     red = '\33[41m'
     normal = '\33[0m'
-    utils = ('wireless_tools', 'net-tools', 'NetworkManager', 'nmcli',  
-             'curl', 'iw', 'ss', 'inxi', 'terminator')
-    programs = ('tshark', 'wireshark', 'kismet', 'horst', 'wihotspot', 
-                'airmon-ng', 'mdk4', 'airgeddon', 'fluxion', 'wifiphisher',
-                'waidps', 'oneshot', 'hashcat', 'hcxdumptool', 'hcxpcapngtool', 
-                'scapy', 'hostapd', 'dnsmasq', 'pixiewps')
+    programs = ('net-tools', 'NetworkManager', 'nmcli', 'curl', 'iw', 'ss', 
+                'lshw', 'inxi', 'terminator', 'tshark', 'wireshark', 'kismet', 
+                'horst', 'wihotspot', 'airmon-ng', 'mdk4', 'airgeddon', 
+                'fluxion', 'wifiphisher', 'waidps', 'oneshot', 'hashcat', 
+                'hcxdumptool', 'hcxpcapngtool', 'scapy', 'hostapd', 'dnsmasq', 
+                'pixiewps')
     print(' Welcome '.center(30, '*'))
     if subprocess.getoutput('whoami') != 'root':
         exit('not root! bye ... bye ...')
-    for i in utils:
-        command = subprocess.getoutput(f"command -v {i}")
-        installed = subprocess.getoutput(f"pacman -Qqe | grep {i}")
-        if command or installed:
-            print(f'[*] {i} ..... {green}[+]{normal}')
-        else:
-            print(f'[*] {i} ..... {red}[-]{normal}')
+    color = f'{green}[+]' if subprocess.getoutput(f"command -v iwconfig") else f'{red}[-]'
+    print(f'[*] wireless_tools ..... {color}{normal}')
     for i in programs:
         command = subprocess.getoutput(f"command -v {i}")
         installed = subprocess.getoutput(f"pacman -Qqe | grep {i}")
